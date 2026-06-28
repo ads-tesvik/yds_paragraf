@@ -7,45 +7,14 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"></script>
 <style>
-/* ═══════════════════════════════════════════════════════════════
-   DESIGN SYSTEM — CSS Custom Properties
-   ═══════════════════════════════════════════════════════════════ */
-:root {
-  --navy:#0f1a2e; --navy-light:#1a2f4e; --navy-mid:#243b5e;
-  --blue:#2563eb; --blue-hover:#1d4ed8; --blue-light:#eff6ff; --blue-mid:#bfdbfe; --blue-pale:#dbeafe;
-  --gold:#e5a00d; --gold-light:#fffbeb; --gold-mid:#fde68a;
-  --green:#10b981; --green-hover:#059669; --green-light:#d1fae5; --green-pale:#ecfdf5;
-  --red:#ef4444; --red-hover:#dc2626; --red-light:#fee2e2; --red-pale:#fef2f2;
-  --amber:#f59e0b; --amber-light:#fef3c7;
-  --purple:#7c3aed; --purple-light:#ede9fe;
-  --teal:#0d9488; --teal-light:#ccfbf1;
-  --pink:#db2777; --pink-light:#fce7f3;
-  --slate:#475569; --slate-light:#f1f5f9; --slate-mid:#cbd5e1;
-  --gray:#6b7280; --gray-light:#f9fafb; --gray-mid:#e5e7eb;
-  --text:#0f172a; --text-secondary:#475569; --text-muted:#94a3b8;
-  --white:#ffffff;
-  --border:#e2e8f0; --border-light:#f1f5f9;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.05);
-  --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
-  --shadow-md:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.05);
-  --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.05);
-  --shadow-xl:0 20px 25px -5px rgba(0,0,0,.1),0 8px 10px -6px rgba(0,0,0,.05);
-  --radius-sm:6px; --radius:8px; --radius-md:10px; --radius-lg:14px; --radius-xl:20px;
-  --transition:200ms ease;
-}
+:root {--navy:#0f1a2e; --navy-light:#1a2f4e; --blue:#2563eb; --blue-hover:#1d4ed8; --blue-light:#eff6ff; --gold:#e5a00d; --gold-light:#fffbeb; --green:#10b981; --green-hover:#059669; --green-light:#d1fae5; --red:#ef4444; --red-hover:#dc2626; --red-light:#fee2e2; --amber:#f59e0b; --amber-light:#fef3c7; --slate:#475569; --slate-light:#f1f5f9; --slate-mid:#cbd5e1; --text:#0f172a; --text-secondary:#475569; --text-muted:#94a3b8; --white:#ffffff; --border:#e2e8f0; --shadow:0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06); --shadow-md:0 4px 6px -1px rgba(0,0,0,.1); --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1); --radius:8px; --radius-lg:14px; --radius-xl:20px; --transition:200ms ease;}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--slate-light);color:var(--text);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased}
-::-webkit-scrollbar{width:6px;height:6px}
-::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{background:var(--slate-mid);border-radius:3px}
-::-webkit-scrollbar-thumb:hover{background:var(--slate)}
 .view{display:none;min-height:100vh}
 .view.active{display:flex;flex-direction:column}
 #view-login,#view-admin-login,#view-register{align-items:center;justify-content:center}
-
-/* TOAST */
 #toast-container{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:8px;max-width:400px}
-.toast{padding:14px 18px;border-radius:var(--radius-md);color:#fff;font-size:.875rem;font-weight:500;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;display:flex;align-items:center;gap:10px;cursor:pointer;max-width:100%;word-break:break-word}
+.toast{padding:14px 18px;border-radius:10px;color:#fff;font-size:.875rem;font-weight:500;box-shadow:var(--shadow-lg);animation:toastIn .3s ease;display:flex;align-items:center;gap:10px;cursor:pointer;max-width:100%;word-break:break-word}
 .toast.success{background:#065f46}
 .toast.error{background:#991b1b}
 .toast.warning{background:#92400e}
@@ -54,22 +23,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
 @keyframes toastIn{from{transform:translateX(120%);opacity:0}to{transform:translateX(0);opacity:1}}
 @keyframes toastOut{from{transform:translateX(0);opacity:1}to{transform:translateX(120%);opacity:0}}
 .toast-close{background:none;border:none;color:rgba(255,255,255,.7);cursor:pointer;font-size:1.1rem;padding:0;line-height:1;margin-left:auto;flex-shrink:0}
-.toast-close:hover{color:#fff}
-
-/* MODAL */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9998;display:flex;align-items:center;justify-content:center;animation:modalFadeIn .2s ease}
-.modal-overlay.closing{animation:modalFadeOut .2s ease forwards}
-.modal-box{background:var(--white);border-radius:var(--radius-xl);padding:32px;max-width:600px;width:90%;box-shadow:var(--shadow-xl);animation:modalSlideIn .3s ease;max-height:90vh;overflow-y:auto}
-.modal-overlay.closing .modal-box{animation:modalSlideOut .2s ease forwards}
+.modal-box{background:var(--white);border-radius:var(--radius-xl);padding:32px;max-width:600px;width:90%;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto}
 @keyframes modalFadeIn{from{opacity:0}to{opacity:1}}
-@keyframes modalFadeOut{from{opacity:1}to{opacity:0}}
-@keyframes modalSlideIn{from{transform:translateY(-30px) scale(.96);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
-@keyframes modalSlideOut{from{transform:translateY(0) scale(1);opacity:1}to{transform:translateY(-30px) scale(.96);opacity:0}}
-.modal-title{font-size:1.2rem;font-weight:700;color:var(--navy);margin-bottom:6px}
-.modal-subtitle{font-size:.85rem;color:var(--text-muted);margin-bottom:24px}
-.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:24px}
-
-/* BUTTONS */
 .btn{padding:10px 20px;border-radius:var(--radius);border:none;cursor:pointer;font-size:.875rem;font-weight:600;transition:var(--transition);display:inline-flex;align-items:center;gap:6px;white-space:nowrap;text-decoration:none;line-height:1.4}
 .btn:hover{transform:translateY(-1px)}
 .btn:active{transform:translateY(0)}
@@ -89,11 +45,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
 .btn-lg{padding:14px 28px;font-size:1rem;border-radius:var(--radius-md)}
 .btn-block{width:100%;justify-content:center}
 .btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-
-/* FORMS */
 .form-group{margin-bottom:16px}
 .form-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text);margin-bottom:6px}
-.form-group .label-hint{font-weight:400;color:var(--text-muted);font-size:.78rem}
 .form-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:.9rem;transition:var(--transition);outline:none;background:var(--white);font-family:inherit}
 .form-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.1)}
 .form-input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(239,68,68,.1)}
@@ -103,23 +56,19 @@ select.form-input{cursor:pointer;appearance:none;background-image:url("data:imag
 .form-inline .form-group{margin-bottom:0}
 .form-error{color:var(--red);font-size:.78rem;margin-top:4px;display:none}
 textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
-
-/* TOPBAR */
 .topbar{background:var(--navy);color:#fff;padding:0 28px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 .topbar-logo{font-size:1.1rem;font-weight:700;letter-spacing:-.3px;display:flex;align-items:center;gap:6px}
 .topbar-logo span{color:var(--gold)}
-.topbar-logo-icon{width:28px;height:28px;background:var(--gold);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:center;color:var(--navy);font-weight:800;font-size:.85rem}
+.topbar-logo-icon{width:28px;height:28px;background:var(--gold);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--navy);font-weight:800;font-size:.85rem}
 .topbar-right{display:flex;align-items:center;gap:12px;font-size:.85rem}
-.topbar-user{color:var(--slate-mid);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.btn-topbar{background:rgba(255,255,255,.1);color:#fff;border:none;padding:7px 14px;border-radius:var(--radius-sm);cursor:pointer;font-size:.8rem;font-weight:600;transition:var(--transition)}
+.topbar-user{color:#94a3b8;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.btn-topbar{background:rgba(255,255,255,.1);color:#fff;border:none;padding:7px 14px;border-radius:6px;cursor:pointer;font-size:.8rem;font-weight:600;transition:var(--transition)}
 .btn-topbar:hover{background:rgba(255,255,255,.2)}
-
-/* LOGIN */
 .auth-bg{position:fixed;inset:0;z-index:-1}
 .auth-bg-student{background:linear-gradient(135deg,var(--navy) 0%,#1e3a6e 40%,#2563eb 100%)}
 .auth-bg-admin{background:linear-gradient(135deg,#0f172a 0%,#1e293b 50%,#334155 100%)}
-.auth-bg-register{background:linear-gradient(135deg,#065f46 0%,#0d9488 50%,#2563eb 100%)}
-.auth-card{background:var(--white);border-radius:var(--radius-xl);padding:44px 40px;width:100%;max-width:430px;box-shadow:var(--shadow-xl);position:relative;z-index:1}
+.auth-bg-register{background:linear-gradient(135deg,var(--navy) 0%,#1e3a6e 40%,var(--green) 100%)}
+.auth-card{background:var(--white);border-radius:var(--radius-xl);padding:44px 40px;width:100%;max-width:430px;box-shadow:var(--shadow-lg);position:relative;z-index:1}
 .auth-logo{font-size:1.8rem;font-weight:800;color:var(--navy);margin-bottom:2px;text-align:center}
 .auth-logo span{color:var(--gold)}
 .auth-subtitle{color:var(--text-muted);font-size:.88rem;margin-bottom:28px;text-align:center}
@@ -133,16 +82,14 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
 .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
 .auth-error{background:var(--red-light);color:var(--red);padding:10px 14px;border-radius:var(--radius);font-size:.82rem;margin-bottom:16px;display:none;border-left:3px solid var(--red)}
 .auth-success{background:var(--green-light);color:#065f46;padding:10px 14px;border-radius:var(--radius);font-size:.82rem;margin-bottom:16px;display:none;border-left:3px solid var(--green)}
-
-/* LIBRARY */
 .lib-header{background:var(--white);border-bottom:1px solid var(--border);padding:22px 28px 0}
-.lib-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px}
+.lib-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:12px}
 .lib-title{font-size:1.35rem;font-weight:700;color:var(--navy)}
 .lib-desc{color:var(--text-muted);font-size:.85rem;margin-bottom:18px}
 .filter-bar{display:flex;gap:2px;overflow-x:auto;padding-bottom:0}
 .filter-tab{padding:9px 16px;border:none;background:transparent;color:var(--text-muted);cursor:pointer;font-size:.83rem;font-weight:500;border-bottom:2.5px solid transparent;white-space:nowrap;transition:var(--transition)}
 .filter-tab.active,.filter-tab:hover{color:var(--blue)}
-.filter-tab.active{border-bottom-color:var(--blue);color:var(--blue);font-weight:600}
+.filter-tab.active{border-bottom-color:var(--blue);font-weight:600}
 .lib-body{padding:24px 28px;flex:1}
 .lib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px}
 .text-card{background:var(--white);border-radius:var(--radius-lg);padding:22px 24px;border:1.5px solid var(--border);cursor:pointer;transition:var(--transition);position:relative;overflow:hidden;display:flex;flex-direction:column}
@@ -164,15 +111,11 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
 .diff-upper{background:var(--amber-light);color:#92400e}
 .diff-advanced{background:var(--red-light);color:#991b1b}
 .card-score{position:absolute;top:16px;right:16px;background:var(--green-light);color:#065f46;font-size:.73rem;font-weight:700;padding:4px 9px;border-radius:20px}
-.card-new{position:absolute;top:16px;right:16px;background:var(--blue-pale);color:var(--blue);font-size:.73rem;font-weight:700;padding:4px 9px;border-radius:20px}
-
-/* STATS BAR */
+.card-new{position:absolute;top:16px;right:16px;background:#dbeafe;color:var(--blue);font-size:.73rem;font-weight:700;padding:4px 9px;border-radius:20px}
 .stats-bar{background:var(--navy);color:#fff;padding:14px 28px;display:flex;gap:28px;align-items:center;flex-wrap:wrap}
 .stat-item{display:flex;flex-direction:column;align-items:center;min-width:70px}
 .stat-num{font-size:1.4rem;font-weight:800;color:var(--gold)}
 .stat-label{font-size:.68rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.5px}
-
-/* READING */
 #view-reading{background:var(--white)}
 .reading-topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .reading-progress-bar{height:4px;background:var(--border);border-radius:2px;width:180px;overflow:hidden}
@@ -189,44 +132,49 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
 .reading-hint{background:var(--gold-light);border:1px solid #fde68a;border-radius:var(--radius-lg);padding:12px 18px;font-size:.82rem;color:#92400e;margin-bottom:24px;display:flex;align-items:center;gap:8px;line-height:1.5}
 .start-questions-btn{display:block;width:100%;max-width:320px;margin:40px auto 20px;padding:15px 24px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-md);font-size:.98rem;font-weight:700;cursor:pointer;transition:var(--transition);text-align:center}
 .start-questions-btn:hover{background:var(--blue-hover);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-
-/* WORD POPUP */
-#word-popup{position:fixed;z-index:999;background:var(--navy);color:#fff;border-radius:var(--radius-md);padding:14px 18px;max-width:270px;box-shadow:var(--shadow-xl);display:none;pointer-events:none;transition:opacity .1s}
+#word-popup{position:fixed;z-index:999;background:var(--navy);color:#fff;border-radius:var(--radius);padding:14px 18px;max-width:270px;box-shadow:var(--shadow-lg);display:none;pointer-events:none;transition:opacity .1s}
 #word-popup.visible{display:block}
 .popup-word{font-size:1rem;font-weight:700;color:var(--gold);margin-bottom:2px}
 .popup-tr{font-size:.88rem;margin-bottom:4px}
 .popup-example{font-size:.76rem;color:#94a3b8;border-top:1px solid rgba(255,255,255,.1);padding-top:6px;margin-top:4px;font-style:italic}
-
-/* QUESTIONS */
 #view-questions{background:var(--slate-light)}
 .q-topbar{background:var(--white);border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
 .q-container{max-width:720px;margin:0 auto;padding:28px 24px}
 .q-mini-progress{display:flex;gap:4px;margin-bottom:22px}
-.q-dot{width:26px;height:5px;border-radius:3px;background:var(--gray-mid)}
+.q-dot{width:26px;height:5px;border-radius:3px;background:#e5e7eb}
 .q-dot.done-correct{background:var(--green)}
 .q-dot.done-wrong{background:var(--red)}
 .q-dot.current{background:var(--blue)}
 .q-number{font-size:.78rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
 .q-text{font-size:1.08rem;font-weight:600;color:var(--navy);line-height:1.7;margin-bottom:22px}
 .q-options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
-.q-option{padding:14px 18px;border:2px solid var(--border);border-radius:var(--radius-md);cursor:pointer;font-size:.93rem;transition:var(--transition);background:var(--white);display:flex;align-items:flex-start;gap:12px}
+.q-option{padding:14px 18px;border:2px solid var(--border);border-radius:var(--radius);cursor:pointer;font-size:.93rem;transition:var(--transition);background:var(--white);display:flex;align-items:flex-start;gap:12px}
 .q-option:hover:not(.disabled){border-color:var(--blue);background:var(--blue-light);transform:translateX(4px)}
 .q-option.correct{border-color:var(--green);background:var(--green-light);color:#065f46}
 .q-option.wrong{border-color:var(--red);background:var(--red-light);color:var(--red)}
 .q-option.disabled{cursor:default}
 .q-option.selected:not(.correct):not(.wrong){border-color:var(--blue);background:var(--blue-light)}
-.opt-letter{width:26px;height:26px;min-width:26px;border-radius:50%;background:var(--gray-mid);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;color:var(--text-muted)}
+.opt-letter{width:26px;height:26px;min-width:26px;border-radius:50%;background:#e5e7eb;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;color:var(--text-muted)}
 .q-option.correct .opt-letter{background:var(--green);color:#fff}
 .q-option.wrong .opt-letter{background:var(--red);color:#fff}
 .q-option.selected .opt-letter{background:var(--blue);color:#fff}
-.q-feedback{border-radius:var(--radius-md);padding:14px 18px;font-size:.88rem;margin-bottom:18px;display:none}
+.q-feedback{border-radius:var(--radius);padding:14px 18px;font-size:.88rem;margin-bottom:18px;display:none}
 .q-feedback.correct{background:var(--green-light);border:1.5px solid var(--green);color:#065f46}
 .q-feedback.wrong{background:var(--red-light);border:1.5px solid var(--red);color:var(--red)}
 .q-feedback-icon{font-weight:700;font-size:1rem;margin-right:6px}
-.q-next-btn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius-md);font-size:.93rem;font-weight:700;cursor:pointer;transition:var(--transition);display:none}
+.q-next-btn{width:100%;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:var(--radius);font-size:.93rem;font-weight:700;cursor:pointer;transition:var(--transition);display:none}
 .q-next-btn:hover{background:var(--blue-hover);transform:translateY(-1px)}
-
-/* RESULTS */
+/* Dynamic admin form cards */
+.word-card,.question-card{background:var(--slate-light);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;position:relative}
+.word-card-header,.question-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.word-card-title,.question-card-title{font-size:.85rem;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:.4px}
+.word-card-body,.question-card-body{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.question-card-body{grid-template-columns:1fr}
+.q-opt-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.q-opt-label{width:28px;height:28px;min-width:28px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.78rem;color:var(--text-muted)}
+.q-opt-row input{flex:1}
+.remove-btn{background:var(--red-light);color:var(--red);border:none;border-radius:6px;padding:4px 10px;font-size:.75rem;font-weight:600;cursor:pointer;transition:var(--transition)}
+.remove-btn:hover{background:var(--red);color:#fff}
 #view-results{background:var(--slate-light)}
 .results-container{max-width:680px;margin:0 auto;padding:36px 24px}
 .results-card{background:var(--white);border-radius:var(--radius-xl);padding:36px 40px;box-shadow:var(--shadow)}
@@ -234,7 +182,7 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
 .results-title{font-size:1.35rem;font-weight:800;color:var(--navy);text-align:center;margin-bottom:4px}
 .results-score-big{font-size:3rem;font-weight:800;text-align:center;color:var(--blue);margin:16px 0}
 .results-score-label{text-align:center;color:var(--text-muted);font-size:.88rem;margin-bottom:24px}
-.results-breakdown{background:var(--slate-light);border-radius:var(--radius-md);padding:20px;margin-bottom:22px}
+.results-breakdown{background:var(--slate-light);border-radius:var(--radius);padding:20px;margin-bottom:22px}
 .results-breakdown-title{font-size:.82rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px}
 .rb-item{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:.88rem}
 .rb-item:last-child{border-bottom:none}
@@ -248,27 +196,25 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
 .re-q{font-weight:600;margin-bottom:4px;color:var(--navy)}
 .re-exp{color:var(--text-muted)}
 .results-actions{display:flex;gap:10px}
-
-/* ADMIN */
 #view-admin{background:var(--slate-light)}
 .admin-container{max-width:1200px;margin:0 auto;padding:28px 24px}
 .admin-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px}
 .admin-title{font-size:1.35rem;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px}
 .admin-subtitle{color:var(--text-muted);font-size:.85rem}
 .admin-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
-.admin-stat{background:var(--white);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.admin-stat{background:var(--white);border-radius:var(--radius-lg);padding:18px 20px;box-shadow:var(--shadow);border:1px solid var(--border)}
 .admin-stat-num{font-size:1.8rem;font-weight:800;color:var(--navy)}
 .admin-stat-label{font-size:.78rem;color:var(--text-muted);margin-top:2px}
 .admin-stat.accent .admin-stat-num{color:var(--blue)}
 .admin-stat.warn .admin-stat-num{color:var(--amber)}
 .admin-stat.good .admin-stat-num{color:var(--green)}
-.admin-section{background:var(--white);border-radius:var(--radius-lg);padding:24px;margin-bottom:18px;box-shadow:var(--shadow-sm);border:1px solid var(--border)}
+.admin-section{background:var(--white);border-radius:var(--radius-lg);padding:24px;margin-bottom:18px;box-shadow:var(--shadow);border:1px solid var(--border)}
 .admin-section-title{font-size:1rem;font-weight:700;color:var(--navy);margin-bottom:16px;display:flex;align-items:center;gap:8px}
 .admin-section-title .count-badge{background:var(--blue-light);color:var(--blue);font-size:.75rem;padding:2px 8px;border-radius:20px;font-weight:600}
 .admin-table-wrap{overflow-x:auto}
 .admin-table{width:100%;border-collapse:collapse;font-size:.84rem}
 .admin-table th{text-align:left;padding:9px 12px;background:var(--slate-light);color:var(--text-muted);font-weight:600;font-size:.73rem;text-transform:uppercase;letter-spacing:.4px;white-space:nowrap}
-.admin-table td{padding:10px 12px;border-bottom:1px solid var(--border-light);vertical-align:middle}
+.admin-table td{padding:10px 12px;border-bottom:1px solid #f1f5f9;vertical-align:middle}
 .admin-table tr:last-child td{border-bottom:none}
 .admin-table tr:hover td{background:var(--slate-light)}
 .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:.7rem;font-weight:700}
@@ -289,53 +235,28 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
 .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted)}
 .empty-state-icon{font-size:2.5rem;margin-bottom:10px}
 .empty-state-text{font-size:.9rem}
-
-/* UPLOAD SECTION */
-.upload-dropzone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:40px 24px;text-align:center;transition:var(--transition);cursor:pointer;background:var(--gray-light)}
+.upload-dropzone{border:2px dashed var(--border);border-radius:var(--radius-lg);padding:40px 24px;text-align:center;transition:var(--transition);cursor:pointer;background:var(--slate-light)}
 .upload-dropzone:hover{border-color:var(--blue);background:var(--blue-light)}
-.upload-dropzone.dragover{border-color:var(--blue);background:var(--blue-pale)}
+.upload-dropzone.dragover{border-color:var(--blue);background:#dbeafe}
 .upload-dropzone-icon{font-size:2.5rem;margin-bottom:12px}
 .upload-dropzone-text{font-size:.9rem;color:var(--text-muted);margin-bottom:4px}
 .upload-dropzone-hint{font-size:.78rem;color:var(--text-muted)}
 .upload-preview-box{background:var(--slate-light);border-radius:var(--radius);padding:16px;margin-top:16px;font-size:.85rem;max-height:200px;overflow-y:auto;border:1px solid var(--border)}
-
-/* RESPONSIVE */
-@media(max-width:768px){
-  .auth-card{padding:28px 20px;margin:12px;max-width:100%}
-  .lib-body,.lib-header{padding:14px}
-  .lib-grid{grid-template-columns:1fr}
-  .reading-container{padding:24px 16px}
-  .stats-bar{gap:16px;padding:12px 14px}
-  .reading-topbar,.q-topbar{padding:10px 14px}
-  .results-container,.admin-container,.q-container{padding:16px 10px}
-  .results-card{padding:24px 20px}
-  .admin-grid{grid-template-columns:repeat(2,1fr)}
-  .topbar{padding:0 14px}
-  .inline-form{flex-direction:column}
-  .inline-form .form-group{min-width:100%}
-  .modal-box{padding:22px 18px}
-  .reading-title{font-size:1.25rem}
-  .form-inline{flex-direction:column}
-  .form-inline .form-group{min-width:100%}
-}
-@media(max-width:480px){
-  .admin-grid{grid-template-columns:1fr}
-  .filter-tab{padding:7px 10px;font-size:.76rem}
-  .results-actions{flex-direction:column}
-}
+.student-card{background:var(--white);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--border);box-shadow:var(--shadow)}
+.student-card-header{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px}
+.student-card-name{font-weight:700;color:var(--navy);font-size:.95rem}
+.student-card-email{font-size:.82rem;color:var(--text-muted)}
+.student-card-note{font-size:.78rem;color:var(--text-muted);margin-top:4px;font-style:italic}
+.student-card-date{font-size:.72rem;color:var(--text-muted);margin-top:4px}
+.student-card-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;align-items:center}
+@media(max-width:768px){.auth-card{padding:28px 20px;margin:12px;max-width:100%}.lib-body,.lib-header{padding:14px}.lib-grid{grid-template-columns:1fr}.reading-container{padding:24px 16px}.stats-bar{gap:16px;padding:12px 14px}.reading-topbar,.q-topbar{padding:10px 14px}.results-container,.admin-container,.q-container{padding:16px 10px}.results-card{padding:24px 20px}.admin-grid{grid-template-columns:repeat(2,1fr)}.topbar{padding:0 14px}.inline-form{flex-direction:column}.inline-form .form-group{min-width:100%}.modal-box{padding:22px 18px}.reading-title{font-size:1.25rem}.form-inline{flex-direction:column}.form-inline .form-group{min-width:100%}}
+@media(max-width:480px){.admin-grid{grid-template-columns:1fr}.filter-tab{padding:7px 10px;font-size:.76rem}.results-actions{flex-direction:column}}
 </style>
 </head>
 <body>
-
-<!-- TOAST CONTAINER -->
 <div id="toast-container"></div>
+<div id="modal-overlay" class="modal-overlay" style="display:none"><div class="modal-box" id="modal-box"></div></div>
 
-<!-- MODAL -->
-<div id="modal-overlay" class="modal-overlay" style="display:none">
-  <div class="modal-box" id="modal-box"></div>
-</div>
-
-<!-- ════════════════════════ 1. STUDENT LOGIN ════════════════════ -->
 <div id="view-login" class="view active">
   <div class="auth-bg auth-bg-student"></div>
   <div class="auth-card">
@@ -343,14 +264,8 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
     <p class="auth-subtitle">YDS & YÖKDİL Okuma Hazırlık Sistemi</p>
     <div class="auth-badge badge-student" style="display:block;text-align:center;width:fit-content;margin:0 auto 20px">👤 Öğrenci Girişi</div>
     <div class="auth-error" id="login-error"></div>
-    <div class="form-group">
-      <label>E-posta Adresi</label>
-      <input type="email" class="form-input" id="login-email" placeholder="ornek@email.com" autocomplete="email">
-    </div>
-    <div class="form-group">
-      <label>Erişim Kodu</label>
-      <input type="text" class="form-input" id="login-code" placeholder="ABC123" autocomplete="off" style="text-transform:uppercase;font-family:'SF Mono','Consolas',monospace;letter-spacing:1px">
-    </div>
+    <div class="form-group"><label>E-posta Adresi</label><input type="email" class="form-input" id="login-email" placeholder="ornek@email.com" autocomplete="email"></div>
+    <div class="form-group"><label>Erişim Kodu</label><input type="text" class="form-input" id="login-code" placeholder="ABC123" autocomplete="off" style="text-transform:uppercase;font-family:monospace;letter-spacing:1px"></div>
     <button class="btn btn-primary btn-block btn-lg" onclick="doStudentLogin()" style="margin-top:4px">Platforma Giriş Yap →</button>
     <div class="auth-footer" style="margin-top:16px">Hesabınız yok mu? <a onclick="showView('view-register')">📝 Kayıt Başvurusu Yapın</a></div>
     <div class="auth-divider">veya</div>
@@ -358,7 +273,6 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
   </div>
 </div>
 
-<!-- ════════════════════════ 2. ADMIN LOGIN ════════════════════ -->
 <div id="view-admin-login" class="view">
   <div class="auth-bg auth-bg-admin"></div>
   <div class="auth-card">
@@ -366,20 +280,13 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
     <p class="auth-subtitle">Yönetici Paneli</p>
     <div class="auth-badge badge-admin" style="display:block;text-align:center;width:fit-content;margin:0 auto 20px">🔐 Admin Girişi</div>
     <div class="auth-error" id="admin-login-error"></div>
-    <div class="form-group">
-      <label>Kullanıcı Adı</label>
-      <input type="text" class="form-input" id="admin-username" placeholder="admin" autocomplete="username">
-    </div>
-    <div class="form-group">
-      <label>Şifre</label>
-      <input type="password" class="form-input" id="admin-password" placeholder="••••" autocomplete="current-password">
-    </div>
+    <div class="form-group"><label>E-posta</label><input type="email" class="form-input" id="admin-email" placeholder="admin@ornek.com" autocomplete="username"></div>
+    <div class="form-group"><label>Şifre</label><input type="password" class="form-input" id="admin-password" placeholder="••••" autocomplete="current-password"></div>
     <button class="btn btn-primary btn-block btn-lg" onclick="doAdminLogin()" style="margin-top:4px">Yönetici Girişi →</button>
     <div class="auth-footer" style="margin-top:16px"><a onclick="showView('view-login')">← Öğrenci Girişine Dön</a></div>
   </div>
 </div>
 
-<!-- ════════════════════════ 3. STUDENT REGISTRATION ════════════════════ -->
 <div id="view-register" class="view">
   <div class="auth-bg auth-bg-register"></div>
   <div class="auth-card">
@@ -387,47 +294,25 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
     <p class="auth-subtitle">Yeni Öğrenci Kayıt Başvurusu</p>
     <div class="auth-error" id="register-error"></div>
     <div class="auth-success" id="register-success"></div>
-    <div class="form-group">
-      <label>Ad Soyad <span class="label-hint">(zorunlu)</span></label>
-      <input type="text" class="form-input" id="reg-name" placeholder="Tam adınız" autocomplete="name">
-    </div>
-    <div class="form-group">
-      <label>E-posta Adresi <span class="label-hint">(zorunlu — onay için)</span></label>
-      <input type="email" class="form-input" id="reg-email" placeholder="ornek@email.com" autocomplete="email">
-    </div>
-    <div class="form-group">
-      <label>Not (isteğe bağlı)</label>
-      <input type="text" class="form-input" id="reg-note" placeholder="Yöneticiye iletmek istediğiniz bir not">
-    </div>
+    <div class="form-group"><label>Ad Soyad <span style="font-weight:400;color:var(--text-muted);font-size:.78rem">(zorunlu)</span></label><input type="text" class="form-input" id="reg-name" placeholder="Tam adınız" autocomplete="name"></div>
+    <div class="form-group"><label>E-posta Adresi <span style="font-weight:400;color:var(--text-muted);font-size:.78rem">(zorunlu — onay için)</span></label><input type="email" class="form-input" id="reg-email" placeholder="ornek@email.com" autocomplete="email"></div>
+    <div class="form-group"><label>Not (isteğe bağlı)</label><input type="text" class="form-input" id="reg-note" placeholder="Yöneticiye iletmek istediğiniz bir not"></div>
     <button class="btn btn-primary btn-block btn-lg" onclick="submitRegistration()" style="margin-top:4px">📩 Başvuruyu Gönder →</button>
     <div class="auth-footer" style="margin-top:16px"><a onclick="showView('view-login')">← Giriş Sayfasına Dön</a></div>
   </div>
 </div>
 
-<!-- ════════════════════════ 4. LIBRARY ════════════════════════ -->
 <div id="view-library" class="view">
   <div class="topbar">
     <div class="topbar-logo"><div class="topbar-logo-icon">Y</div>YDS<span>Platform</span></div>
-    <div class="topbar-right">
-      <span class="topbar-user" id="topbar-username"></span>
-      <button class="btn-topbar" onclick="doLogout()">Çıkış</button>
-    </div>
+    <div class="topbar-right"><span class="topbar-user" id="topbar-username"></span><button class="btn-topbar" onclick="doLogout()">Çıkış</button></div>
   </div>
   <div class="lib-header">
     <div class="lib-title-row">
       <div class="lib-title">📚 Okuma Kütüphanesi</div>
       <div class="form-inline" style="margin-bottom:12px">
-        <div class="form-group">
-          <select class="form-input" id="lib-difficulty" onchange="renderLibrary()" style="min-width:130px">
-            <option value="all">Tüm Zorluklar</option>
-            <option value="intermediate">🟢 Intermediate</option>
-            <option value="upper">🟡 Upper</option>
-            <option value="advanced">🔴 Advanced</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <input type="text" class="form-input" id="lib-search" placeholder="🔍 Metin ara..." oninput="renderLibrary()" style="min-width:180px">
-        </div>
+        <div class="form-group"><select class="form-input" id="lib-difficulty" onchange="renderLibrary()" style="min-width:130px"><option value="all">Tüm Zorluklar</option><option value="intermediate">🟢 Intermediate</option><option value="upper">🟡 Upper</option><option value="advanced">🔴 Advanced</option></select></div>
+        <div class="form-group"><input type="text" class="form-input" id="lib-search" placeholder="🔍 Metin ara..." oninput="renderLibrary()" style="min-width:180px"></div>
       </div>
     </div>
     <div class="lib-desc">Bir metin seçin, okuyun ve soruları yanıtlayın. Sarı kelimelere tıklayarak Türkçe anlamını görebilirsiniz.</div>
@@ -447,12 +332,9 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
     <div class="stat-item"><div class="stat-num" id="stat-avg">—</div><div class="stat-label">Ortalama %</div></div>
     <div class="stat-item"><div class="stat-num" id="stat-words">0</div><div class="stat-label">Öğrenilen Kelime</div></div>
   </div>
-  <div class="lib-body">
-    <div class="lib-grid" id="lib-grid"></div>
-  </div>
+  <div class="lib-body"><div class="lib-grid" id="lib-grid"></div></div>
 </div>
 
-<!-- ════════════════════════ 5. READING ════════════════════════ -->
 <div id="view-reading" class="view">
   <div class="reading-topbar">
     <button class="btn btn-ghost btn-sm" onclick="goToLibrary()">← Kütüphaneye Dön</button>
@@ -469,7 +351,6 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
   </div>
 </div>
 
-<!-- ════════════════════════ 6. QUESTIONS ════════════════════════ -->
 <div id="view-questions" class="view">
   <div class="q-topbar">
     <button class="btn btn-ghost btn-sm" onclick="goToReading()">← Metne Dön</button>
@@ -486,13 +367,10 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
   </div>
 </div>
 
-<!-- ════════════════════════ 7. RESULTS ════════════════════════ -->
 <div id="view-results" class="view">
   <div class="topbar">
     <div class="topbar-logo"><div class="topbar-logo-icon">Y</div>YDS<span>Platform</span></div>
-    <div class="topbar-right">
-      <button class="btn-topbar" onclick="goToLibrary()">← Kütüphane</button>
-    </div>
+    <div class="topbar-right"><button class="btn-topbar" onclick="goToLibrary()">← Kütüphane</button></div>
   </div>
   <div class="results-container">
     <div class="results-card">
@@ -510,20 +388,14 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
   </div>
 </div>
 
-<!-- ════════════════════════ 8. ADMIN PANEL ════════════════════════ -->
 <div id="view-admin" class="view">
   <div class="topbar">
     <div class="topbar-logo"><div class="topbar-logo-icon">Y</div>YDS<span>Platform</span> — <span style="color:var(--gold)">Yönetici</span></div>
-    <div class="topbar-right">
-      <button class="btn-topbar" onclick="doAdminLogout()">🔒 Çıkış</button>
-    </div>
+    <div class="topbar-right"><button class="btn-topbar" onclick="doAdminLogout()">🔒 Çıkış</button></div>
   </div>
   <div class="admin-container">
     <div class="admin-header">
-      <div>
-        <div class="admin-title">🔐 Yönetici Paneli</div>
-        <div class="admin-subtitle">Öğrenci kayıtlarını, erişim kodlarını, içerikleri ve metin yüklemelerini yönetin.</div>
-      </div>
+      <div><div class="admin-title">🔐 Yönetici Paneli</div><div class="admin-subtitle">Öğrenci kayıtlarını, erişim kodlarını, içerikleri ve metin yüklemelerini yönetin.</div></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-outline btn-sm" onclick="exportAllData()">📤 Dışa Aktar</button>
         <button class="btn btn-outline-red btn-sm" onclick="resetAllData()">🗑 Sıfırla</button>
@@ -585,41 +457,50 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
     </div>
     <div class="tab-content" id="tab-upload">
       <div class="admin-section">
-        <div class="admin-section-title">📄 Word Dosyasından Metin Yükle</div>
-        <div class="upload-dropzone" id="upload-dropzone" onclick="document.getElementById('upload-file').click()">
-          <div class="upload-dropzone-icon">📁</div>
-          <div class="upload-dropzone-text"><b>.docx</b> dosyanızı sürükleyin veya tıklayın</div>
-          <div class="upload-dropzone-hint">Sadece .docx formatı desteklenir. Eski .doc dosyalarını önce .docx'e dönüştürün.</div>
+        <div class="admin-section-title">📄 Yeni Metin Ekle</div>
+        <div style="display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:20px">
+          <button class="tab-btn active" id="upload-tab-word" onclick="switchUploadTab('word')" style="padding:10px 18px">📄 Word'ten Yükle</button>
+          <button class="tab-btn" id="upload-tab-manual" onclick="switchUploadTab('manual')" style="padding:10px 18px">✏️ Manuel Ekle</button>
         </div>
-        <input type="file" id="upload-file" accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document" style="display:none" onchange="handleFileUpload(this)">
-        <div id="upload-preview-area" style="display:none">
-          <div class="upload-preview-box" id="upload-raw-preview"></div>
-          <div class="admin-section-title" style="margin-top:20px">✏️ Düzenle & Kaydet</div>
-          <div class="form-inline" style="flex-direction:column;align-items:stretch">
-            <div class="form-group" style="width:100%"><label>Başlık</label><input type="text" class="form-input" id="up-title" placeholder="Metin başlığı"></div>
-            <div class="form-group" style="width:100%"><label>Kaynak</label><input type="text" class="form-input" id="up-source" placeholder="Örn: Adapted from The Economist"></div>
-            <div class="form-inline" style="width:100%">
-              <div class="form-group"><label>Kategori</label>
-                <select class="form-input" id="up-category">
-                  <option value="history">📜 Tarih</option><option value="psychology">🧠 Psikoloji</option><option value="economics">📈 Ekonomi</option>
-                  <option value="science">🔬 Bilim</option><option value="society">🌍 Toplum</option><option value="technology">💻 Teknoloji</option>
-                </select>
-              </div>
-              <div class="form-group"><label>Zorluk</label>
-                <select class="form-input" id="up-difficulty">
-                  <option value="intermediate">🟢 Intermediate</option><option value="upper">🟡 Upper</option><option value="advanced">🔴 Advanced</option>
-                </select>
-              </div>
-            </div>
-            <div class="form-group" style="width:100%"><label>Metin Paragrafları (her paragraf yeni satır)</label><textarea class="form-input" id="up-passage" rows="6"></textarea></div>
-            <div class="form-group" style="width:100%"><label>Hedef Kelimeler (Format: kelime: Türkçe anlam - örnek cümle)</label><textarea class="form-input" id="up-words" rows="5" placeholder="emerged: ortaya çıkmak - A new idea emerged from the discussion.
-principality: prenslik - The principality maintained independence."></textarea></div>
-            <div class="form-group" style="width:100%"><label>Sorular (Format: Soru?|A)opt B)opt C)opt D)opt|Doğru:0-3|Açıklama)</label><textarea class="form-input" id="up-questions" rows="8" placeholder="What was the primary factor?|Economic trade|Military campaigns and political alliances|Religious conversion|Agricultural development|1|Metinde 'strategic military campaigns' geçmektedir.
-What happened to Constantinople?|It was destroyed|It became Istanbul|It was abandoned|It became a religious center|1|Metin: 'transforming it into Istanbul'"></textarea></div>
-            <div style="display:flex;gap:10px;margin-top:8px">
+
+        <!-- Word Upload -->
+        <div id="upload-panel-word">
+          <div class="upload-dropzone" id="upload-dropzone" onclick="document.getElementById('upload-file').click()">
+            <div class="upload-dropzone-icon">📁</div>
+            <div class="upload-dropzone-text"><b>.docx</b> dosyanızı sürükleyin veya tıklayın</div>
+            <div class="upload-dropzone-hint">Format: BAŞLIK, KAYNAK, PARAGRAF, KELİMELER, SORULAR bölümleri</div>
+          </div>
+          <input type="file" id="upload-file" accept=".docx" style="display:none" onchange="handleFileUpload(this)">
+          <div id="upload-preview-area" style="display:none;margin-top:16px">
+            <div class="upload-preview-box" id="upload-raw-preview"></div>
+            <div style="display:flex;gap:10px;margin-top:12px">
               <button class="btn btn-success" onclick="submitUploadedText()">💾 Supabase'e Kaydet</button>
               <button class="btn btn-ghost" onclick="clearUpload()">🗑 Temizle</button>
             </div>
+          </div>
+        </div>
+
+        <!-- Manual Form -->
+        <div id="upload-panel-manual" style="display:none">
+          <div class="form-group"><label>📌 Başlık</label><input type="text" class="form-input" id="m-title" placeholder="Metin başlığı"></div>
+          <div class="form-group"><label>📚 Kaynak</label><input type="text" class="form-input" id="m-source" placeholder="Örn: Adapted from The Economist"></div>
+          <div class="form-inline" style="margin-bottom:16px">
+            <div class="form-group"><label>Kategori</label><select class="form-input" id="m-category"><option value="history">📜 Tarih</option><option value="psychology">🧠 Psikoloji</option><option value="economics">📈 Ekonomi</option><option value="science">🔬 Bilim</option><option value="society">🌍 Toplum</option><option value="technology">💻 Teknoloji</option></select></div>
+            <div class="form-group"><label>Zorluk</label><select class="form-input" id="m-difficulty"><option value="intermediate">🟢 Intermediate</option><option value="upper">🟡 Upper</option><option value="advanced">🔴 Advanced</option></select></div>
+          </div>
+          <div class="form-group"><label>📝 Metin Paragrafları (her paragraf yeni satır)</label><textarea class="form-input" id="m-passage" rows="6" placeholder="Paragraf 1...\nParagraf 2..."></textarea></div>
+
+          <div class="admin-section-title" style="margin-top:24px">🎯 Hedef Kelimeler <span class="count-badge" id="word-count">0</span></div>
+          <div id="word-list"></div>
+          <button class="btn btn-outline btn-sm" onclick="addWordForm()" style="margin-top:8px">+ Kelime Ekle</button>
+
+          <div class="admin-section-title" style="margin-top:24px">❓ Sorular <span class="count-badge" id="question-count">0</span></div>
+          <div id="question-list"></div>
+          <button class="btn btn-outline btn-sm" onclick="addQuestionForm()" style="margin-top:8px">+ Soru Ekle (5 Seçenekli)</button>
+
+          <div style="display:flex;gap:10px;margin-top:24px">
+            <button class="btn btn-success btn-lg" onclick="submitManualText()">💾 Supabase'e Kaydet</button>
+            <button class="btn btn-ghost" onclick="clearManualForm()">🗑 Tümünü Temizle</button>
           </div>
         </div>
       </div>
@@ -629,7 +510,7 @@ What happened to Constantinople?|It was destroyed|It became Istanbul|It was aban
         <div class="admin-section-title">🔑 Admin Şifresini Değiştir</div>
         <div class="inline-form">
           <div class="form-group"><label>Mevcut Şifre</label><input type="password" class="form-input" id="settings-old-pass" placeholder="Mevcut şifre"></div>
-          <div class="form-group"><label>Yeni Şifre</label><input type="password" class="form-input" id="settings-new-pass" placeholder="En az 4 karakter"></div>
+          <div class="form-group"><label>Yeni Şifre</label><input type="password" class="form-input" id="settings-new-pass" placeholder="En az 6 karakter"></div>
           <div class="form-group" style="display:flex;align-items:end"><button class="btn btn-primary" onclick="changeAdminPassFromSettings()">Güncelle</button></div>
         </div>
       </div>
@@ -641,817 +522,873 @@ What happened to Constantinople?|It was destroyed|It became Istanbul|It was aban
   </div>
 </div>
 
-<!-- WORD POPUP -->
 <div id="word-popup">
   <div class="popup-word" id="popup-word"></div>
   <div class="popup-tr" id="popup-tr"></div>
   <div class="popup-example" id="popup-example"></div>
 </div>
-
 <script>
-// ═══════════════════════════════════════════════════════════════
-// CONFIG — Supabase credentials (KULLANICI DEĞİŞTİRMELİ)
-// ═══════════════════════════════════════════════════════════════
+/* ============================================================
+   YDS/YÖKDİL Okuma Platformu — istemci mantığı (v2, düzeltilmiş)
+   - Öğrenci: e-posta + erişim kodu (student_login / student_register RPC)
+   - Admin:   Supabase Auth (e-posta + şifre) + is_admin kontrolü
+   - Veri:    words = nesne {kelime:{tr,ex}}, questions = [{q,opts,ans,exp}]
+   ============================================================ */
+
 const SUPABASE_URL = 'https://ypzsokhbypbxdatfwtbc.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_pBQZkrKXRS12tJObLD6s9w_B2yahQvz'; // DÜZENLE: Settings → API → anon public
-
-// ═══════════════════════════════════════════════════════════════
-// STATE
-// ═══════════════════════════════════════════════════════════════
+const SUPABASE_ANON_KEY = 'sb_publishable_pBQZkrKXRS12tJObLD6s9w_B2yahQvz';
 let supabaseClient = null;
-let currentStudent = null;
-let currentAdmin = null;
-let textsCache = [];
-let currentText = null;
-let currentQuestionIdx = 0;
-let currentAnswers = [];
-let learnedWordsThisSession = [];
 
-// ═══════════════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════════════
-function init() {
-  try {
+let currentTexts = [], currentText = null, questions = [], currentQuestion = 0, answers = [];
+let student = null, adminEmail = null;
+let currentCategory = 'all';
+
+const CAT_LABELS  = { history:'Tarih', psychology:'Psikoloji', economics:'Ekonomi', science:'Bilim', society:'Toplum', technology:'Teknoloji' };
+const DIFF_LABELS = { intermediate:'Intermediate', upper:'Upper', advanced:'Advanced' };
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function wordCount(w){ return (w && typeof w === 'object' && !Array.isArray(w)) ? Object.keys(w).length : (Array.isArray(w) ? w.length : 0); }
+
+async function init() {
     supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  } catch(e) {
-    console.error('Supabase init failed:', e);
-  }
-  
-  // Restore sessions
-  const s = localStorage.getItem('yds_student');
-  if(s) { currentStudent = JSON.parse(s); checkStudentSession(); }
-  const a = localStorage.getItem('yds_admin');
-  if(a) { currentAdmin = JSON.parse(a); }
-  
-  // Filter tabs
-  document.querySelectorAll('#filter-tabs .filter-tab').forEach(btn => {
-    btn.onclick = () => {
-      document.querySelectorAll('#filter-tabs .filter-tab').forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      renderLibrary();
-    };
-  });
-  
-  // Admin tabs
-  document.querySelectorAll('.tab-btn').forEach(btn => {
-    btn.onclick = () => {
-      const tab = btn.dataset.tab;
-      if(!tab) return;
-      document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));
-      btn.classList.add('active');
-      const tc = document.getElementById(tab);
-      if(tc) tc.classList.add('active');
-      if(tab === 'tab-upload') initUploadDropzone();
-    };
-  });
-  
-  // Word popup mouse tracking
-  document.addEventListener('mousemove', e => {
-    const popup = document.getElementById('word-popup');
-    if(popup.classList.contains('visible')) {
-      popup.style.left = (e.clientX + 12) + 'px';
-      popup.style.top = (e.clientY + 12) + 'px';
+
+    document.querySelectorAll('.filter-tab').forEach(t => t.addEventListener('click', () => {
+        document.querySelectorAll('.filter-tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        currentCategory = t.dataset.cat;
+        renderLibrary();
+    }));
+    document.querySelectorAll('.tab-btn').forEach(t => t.addEventListener('click', () => {
+        if (!t.dataset.tab) return; // upload alt-sekmeleri kendi onclick'ini kullanır
+        document.querySelectorAll('.tab-btn').forEach(x => { if (x.dataset.tab) x.classList.remove('active'); });
+        t.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        const tc = document.getElementById(t.dataset.tab);
+        if (tc) tc.classList.add('active');
+    }));
+    const dropzone = document.getElementById('upload-dropzone');
+    if (dropzone) {
+        dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+        dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+        dropzone.addEventListener('drop', e => {
+            e.preventDefault(); dropzone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length) { document.getElementById('upload-file').files = files; handleFileUpload(document.getElementById('upload-file')); }
+        });
     }
-  });
-  
-  // Enter key on login
-  document.getElementById('login-code').addEventListener('keypress', e=>{if(e.key==='Enter')doStudentLogin()});
-  document.getElementById('admin-password').addEventListener('keypress', e=>{if(e.key==='Enter')doAdminLogin()});
+    const today  = new Date().toISOString().split('T')[0];
+    const future = new Date(Date.now() + 30 * 86400000).toISOString().split('T')[0];
+    if (document.getElementById('man-start')) document.getElementById('man-start').value = today;
+    if (document.getElementById('man-end'))   document.getElementById('man-end').value   = future;
+
+    // Oturum geri yükleme: önce admin (Supabase Auth), sonra öğrenci (saklı e-posta+kod)
+    const restoredAdmin = await restoreAdminSession();
+    if (!restoredAdmin) {
+        const restoredStudent = await checkStudentSession();
+        if (!restoredStudent) showView('view-login');
+    }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// VIEWS
-// ═══════════════════════════════════════════════════════════════
-function showView(id) {
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  const el = document.getElementById(id);
-  if(el) el.classList.add('active');
-  window.scrollTo(0,0);
+/* ---------- Genel UI ---------- */
+function showToast(type, message) {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+    toast.innerHTML = '<span>' + icon + ' ' + esc(message) + '</span><button class="toast-close" onclick="this.parentElement.classList.add(\'out\');setTimeout(()=>this.parentElement.remove(),300)">✕</button>';
+    container.appendChild(toast);
+    setTimeout(() => { toast.classList.add('out'); setTimeout(() => toast.remove(), 300); }, 5000);
+}
+function showView(viewId) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    const el = document.getElementById(viewId);
+    if (el) el.classList.add('active');
+    window.scrollTo(0, 0);
+}
+function hideModal() {
+    document.getElementById('modal-overlay').style.display = 'none';
+    document.getElementById('modal-box').innerHTML = '';
 }
 
-function showLogin() { showView('view-login'); }
-function showAdminLogin() { showView('view-admin-login'); }
-function showLibrary() { showView('view-library'); loadTexts(); renderLibrary(); updateStats(); }
-function showAdmin() { showView('view-admin'); loadAdminStats(); loadAdminData(); }
-
-// ═══════════════════════════════════════════════════════════════
-// TOAST
-// ═══════════════════════════════════════════════════════════════
-function showToast(msg, type='info', duration=4000) {
-  const tc = document.getElementById('toast-container');
-  const t = document.createElement('div');
-  t.className = 'toast ' + type;
-  t.innerHTML = `<span>${msg}</span><button class="toast-close" onclick="this.parentElement.remove()">×</button>`;
-  tc.appendChild(t);
-  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(), 300); }, duration);
-}
-
-// ═══════════════════════════════════════════════════════════════
-// STUDENT AUTH
-// ═══════════════════════════════════════════════════════════════
+/* ---------- Öğrenci kimlik doğrulama ---------- */
 async function doStudentLogin() {
-  const email = document.getElementById('login-email').value.trim().toLowerCase();
-  const code = document.getElementById('login-code').value.trim().toUpperCase();
-  const err = document.getElementById('login-error');
-  if(!email || !code) { err.textContent='E-posta ve kod zorunlu.'; err.style.display='block'; return; }
-  err.style.display='none';
-  
-  try {
-    const { data, error } = await supabaseClient.rpc('student_login', { p_email: email, p_code: code });
-    if(error) throw error;
-    if(!data.success) { err.textContent = data.message; err.style.display='block'; return; }
-    
-    currentStudent = data.student;
-    localStorage.setItem('yds_student', JSON.stringify(currentStudent));
-    document.getElementById('topbar-username').textContent = currentStudent.name;
-    showLibrary();
-    showToast('Hoş geldiniz, ' + currentStudent.name + '!', 'success');
-  } catch(e) {
-    console.error(e);
-    err.textContent = 'Bağlantı hatası. Tekrar deneyin.'; err.style.display='block';
-  }
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const code  = document.getElementById('login-code').value.trim().toUpperCase();
+    if (!email || !code) { showToast('error', 'E-posta ve kod zorunlu'); return; }
+    try {
+        const { data, error } = await supabaseClient.rpc('student_login', { p_email: email, p_code: code });
+        if (error) throw error;
+        if (!data || !data.success) { showToast('error', (data && data.message) || 'Giriş başarısız'); return; }
+        student = data.student;
+        localStorage.setItem('student_email', email);
+        localStorage.setItem('student_code', code);
+        enterLibrary();
+        showToast('success', 'Hoş geldiniz, ' + (student.name || student.email));
+    } catch (e) { showToast('error', e.message || 'Giriş hatası'); }
+}
+
+function enterLibrary() {
+    document.getElementById('topbar-username').textContent = student.name || student.email;
+    showView('view-library');
+    loadTexts();
 }
 
 async function checkStudentSession() {
-  if(!currentStudent || !supabaseClient) return;
-  try {
-    const { data, error } = await supabaseClient.rpc('check_student_access', { p_student_id: currentStudent.id });
-    if(error || !data || !data.valid) {
-      showToast(data?.message || 'Oturum sonlandı.', 'warning');
-      doLogout();
-    }
-  } catch(e) { console.error(e); }
+    const email = localStorage.getItem('student_email');
+    const code  = localStorage.getItem('student_code');
+    if (!email || !code) return false;
+    try {
+        const { data, error } = await supabaseClient.rpc('student_login', { p_email: email, p_code: code });
+        if (error || !data || !data.success) { localStorage.removeItem('student_email'); localStorage.removeItem('student_code'); return false; }
+        student = data.student;
+        enterLibrary();
+        return true;
+    } catch (e) { return false; }
+}
+
+function doLogout(silent) {
+    student = null;
+    localStorage.removeItem('student_email');
+    localStorage.removeItem('student_code');
+    if (!silent) showToast('info', 'Çıkış yapıldı');
+    showView('view-login');
 }
 
 async function submitRegistration() {
-  const name = document.getElementById('reg-name').value.trim();
-  const email = document.getElementById('reg-email').value.trim().toLowerCase();
-  const note = document.getElementById('reg-note').value.trim();
-  const err = document.getElementById('register-error');
-  const suc = document.getElementById('register-success');
-  if(!name || !email) { err.textContent='Ad soyad ve e-posta zorunlu.'; err.style.display='block'; suc.style.display='none'; return; }
-  if(!email.includes('@')) { err.textContent='Geçerli e-posta girin.'; err.style.display='block'; suc.style.display='none'; return; }
-  err.style.display='none';
-  
-  try {
-    const { data, error } = await supabaseClient.rpc('student_register', { p_name: name, p_email: email, p_note: note });
-    if(error) throw error;
-    if(data.success) {
-      suc.textContent = data.message; suc.style.display='block';
-      document.getElementById('reg-name').value=''; document.getElementById('reg-email').value=''; document.getElementById('reg-note').value='';
-    } else {
-      err.textContent = data.message; err.style.display='block'; suc.style.display='none';
+    const name  = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+    const note  = document.getElementById('reg-note').value.trim();
+    if (!name || !email) { showToast('error', 'Ad soyad ve e-posta zorunlu'); return; }
+    if (!email.includes('@')) { showToast('error', 'Geçerli e-posta girin'); return; }
+    try {
+        const { data, error } = await supabaseClient.rpc('student_register', { p_name: name, p_email: email, p_note: note });
+        if (error) throw error;
+        if (!data || !data.success) {
+            document.getElementById('register-error').style.display = 'block';
+            document.getElementById('register-error').textContent = '❌ ' + ((data && data.message) || 'Başvuru alınamadı');
+            document.getElementById('register-success').style.display = 'none';
+            return;
+        }
+        document.getElementById('register-success').style.display = 'block';
+        document.getElementById('register-success').textContent = '✅ ' + data.message;
+        document.getElementById('register-error').style.display = 'none';
+        document.getElementById('reg-name').value = ''; document.getElementById('reg-email').value = ''; document.getElementById('reg-note').value = '';
+        showToast('success', 'Başvuru gönderildi');
+    } catch (e) {
+        document.getElementById('register-error').style.display = 'block';
+        document.getElementById('register-error').textContent = '❌ ' + (e.message || 'Bir hata oluştu');
+        document.getElementById('register-success').style.display = 'none';
     }
-  } catch(e) {
-    console.error(e);
-    err.textContent = 'Bağlantı hatası. Tekrar deneyin.'; err.style.display='block'; suc.style.display='none';
-  }
 }
 
-function doLogout() {
-  currentStudent = null; localStorage.removeItem('yds_student');
-  showLogin(); showToast('Çıkış yapıldı.', 'info');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// ADMIN AUTH
-// ═══════════════════════════════════════════════════════════════
+/* ---------- Admin kimlik doğrulama (Supabase Auth) ---------- */
 async function doAdminLogin() {
-  const u = document.getElementById('admin-username').value.trim();
-  const p = document.getElementById('admin-password').value;
-  const err = document.getElementById('admin-login-error');
-  if(!u || !p) { err.textContent='Kullanıcı adı ve şifre zorunlu.'; err.style.display='block'; return; }
-  err.style.display='none';
-  try {
-    const { data, error } = await supabaseClient.rpc('admin_login', { p_username: u, p_password: p });
-    if(error) throw error;
-    if(!data.success) { err.textContent = data.message; err.style.display='block'; return; }
-    currentAdmin = data.admin;
-    localStorage.setItem('yds_admin', JSON.stringify(currentAdmin));
-    showAdmin();
-    showToast('Yönetici girişi başarılı!', 'success');
-  } catch(e) {
-    console.error(e);
-    err.textContent = 'Bağlantı hatası.'; err.style.display='block';
-  }
+    const email    = document.getElementById('admin-email').value.trim().toLowerCase();
+    const password = document.getElementById('admin-password').value;
+    if (!email || !password) { showToast('error', 'E-posta ve şifre zorunlu'); return; }
+    try {
+        const { error: signErr } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (signErr) { showToast('error', 'E-posta veya şifre hatalı'); return; }
+        const ok = await verifyAdmin();
+        if (!ok) { await supabaseClient.auth.signOut(); showToast('error', 'Bu hesabın admin yetkisi yok'); return; }
+        adminEmail = email;
+        showToast('success', 'Admin girişi başarılı');
+        showView('view-admin');
+        loadAdminData();
+        renderTextStats();
+    } catch (e) { showToast('error', e.message || 'Admin girişi hatası'); }
 }
 
-function doAdminLogout() {
-  currentAdmin = null; localStorage.removeItem('yds_admin'); showLogin();
-  showToast('Yönetici çıkışı yapıldı.', 'info');
+async function verifyAdmin() {
+    try {
+        const { data, error } = await supabaseClient.rpc('check_is_admin');
+        if (error) return false;
+        return !!(data && data.is_admin);
+    } catch (e) { return false; }
 }
 
-function requireAdmin() {
-  if(!currentAdmin) { showLogin(); showToast('Yönetici girişi gerekli.', 'error'); return false; }
-  return true;
+async function restoreAdminSession() {
+    try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return false;
+        const ok = await verifyAdmin();
+        if (!ok) return false;
+        adminEmail = session.user.email;
+        showView('view-admin');
+        loadAdminData();
+        renderTextStats();
+        return true;
+    } catch (e) { return false; }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TEXTS / LIBRARY
-// ═══════════════════════════════════════════════════════════════
+async function doAdminLogout() {
+    try { await supabaseClient.auth.signOut(); } catch (e) {}
+    adminEmail = null;
+    showToast('info', 'Admin çıkışı yapıldı');
+    showView('view-login');
+}
+
+/* ---------- Kütüphane ---------- */
 async function loadTexts() {
-  if(!supabaseClient) return;
-  try {
-    const { data, error } = await supabaseClient.from('texts').select('*').eq('is_published', true).order('created_at', {ascending:false});
-    if(error) throw error;
-    textsCache = data || [];
-  } catch(e) { console.error('loadTexts error', e); showToast('Metinler yüklenemedi.', 'error'); }
+    try {
+        const { data, error } = await supabaseClient.from('texts').select('*').eq('is_published', true).order('created_at', { ascending: false });
+        if (error) throw error;
+        currentTexts = data || [];
+        renderLibrary();
+    } catch (e) {
+        showToast('error', 'Metinler yüklenemedi: ' + (e.message || 'Bilinmeyen hata'));
+    }
 }
-
-function getCategoryLabel(cat) {
-  const map = {history:'📜 Tarih', psychology:'🧠 Psikoloji', economics:'📈 Ekonomi', science:'🔬 Bilim', society:'🌍 Toplum', technology:'💻 Teknoloji'};
-  return map[cat] || cat;
-}
-function getCategoryClass(cat) { return 'cat-' + cat; }
-function getDiffClass(d) { return 'diff-' + d; }
-function getDiffLabel(d) { const map={intermediate:'🟢 Orta', upper:'🟡 Üst', advanced:'🔴 İleri'}; return map[d]||d; }
 
 function renderLibrary() {
-  const grid = document.getElementById('lib-grid');
-  const catBtn = document.querySelector('#filter-tabs .filter-tab.active');
-  const cat = catBtn ? catBtn.dataset.cat : 'all';
-  const diff = document.getElementById('lib-difficulty').value;
-  const search = document.getElementById('lib-search').value.toLowerCase();
-  
-  let filtered = textsCache;
-  if(cat !== 'all') filtered = filtered.filter(t=>t.category===cat);
-  if(diff !== 'all') filtered = filtered.filter(t=>t.difficulty===diff);
-  if(search) filtered = filtered.filter(t=>(t.title+' '+t.source).toLowerCase().includes(search));
-  
-  const progress = currentStudent?.progress || {};
-  const learned = currentStudent?.learned_words || [];
-  
-  grid.innerHTML = filtered.map(t => {
-    const completed = progress[t.id];
-    const score = completed ? completed.score : null;
-    return `
-      <div class="text-card ${score!==null?'completed':''}" onclick="openText('${t.id}')">
-        <div class="card-badge-row">
-          <span class="card-cat ${getCategoryClass(t.category)}">${getCategoryLabel(t.category)}</span>
-          <span class="card-diff ${getDiffClass(t.difficulty)}">${getDiffLabel(t.difficulty)}</span>
-        </div>
-        <div class="card-title">${t.title}</div>
-        <div class="card-meta">
-          <span>${t.source || 'Kaynak belirtilmemiş'}</span>
-          <span>• ${(t.passage||[]).length} paragraf</span>
-          <span>• ${(t.words?Object.keys(t.words).length:0)} kelime</span>
-        </div>
-        ${score!==null?`<div class="card-score">${score}%</div>`:`<div class="card-new">Yeni</div>`}
-      </div>`;
-  }).join('');
-  
-  if(filtered.length===0) grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📭</div><div class="empty-state-text">Bu filtreye uygun metin bulunmuyor.</div></div>';
-  
-  document.getElementById('stat-total').textContent = textsCache.length;
-  const done = Object.keys(progress).length;
-  document.getElementById('stat-done').textContent = done;
-  const scores = Object.values(progress).map(p=>p.score);
-  const avg = scores.length ? Math.round(scores.reduce((a,b)=>a+b,0)/scores.length) : '—';
-  document.getElementById('stat-avg').textContent = avg + (avg!=='—'?'%':'');
-  document.getElementById('stat-words').textContent = learned.length;
-}
-
-function updateStats() { renderLibrary(); }
-
-// ═══════════════════════════════════════════════════════════════
-// READING
-// ═══════════════════════════════════════════════════════════════
-function openText(textId) {
-  if(!currentStudent) { showLogin(); return; }
-  checkStudentSession();
-  const t = textsCache.find(x=>x.id===textId);
-  if(!t) { showToast('Metin bulunamadı.', 'error'); return; }
-  currentText = t;
-  currentQuestionIdx = 0; currentAnswers = []; learnedWordsThisSession = [];
-  
-  document.getElementById('reading-cat').textContent = getCategoryLabel(t.category);
-  document.getElementById('reading-cat').className = 'reading-cat ' + getCategoryClass(t.category);
-  document.getElementById('reading-title').textContent = t.title;
-  document.getElementById('reading-source').textContent = (t.source || 'Kaynak belirtilmemiş') + '  •  ' + getDiffLabel(t.difficulty);
-  
-  const body = document.getElementById('reading-body');
-  const words = t.words || {};
-  body.innerHTML = (t.passage || []).map(para => {
-    let html = ' ' + para + ' ';
-    Object.keys(words).forEach(w => {
-      const re = new RegExp('\\b' + w + '\\b', 'gi');
-      html = html.replace(re, `<span class="target-word" data-word="${w}" onclick="showWordPopup('${w}')">${w}</span>`);
+    const search = (document.getElementById('lib-search').value || '').toLowerCase();
+    const diff   = document.getElementById('lib-difficulty').value;
+    const progress = (student && Array.isArray(student.progress)) ? student.progress : [];
+    const filtered = currentTexts.filter(t => {
+        if (!t) return false;
+        if (currentCategory !== 'all' && t.category !== currentCategory) return false;
+        if (diff !== 'all' && t.difficulty !== diff) return false;
+        if (search && !(t.title || '').toLowerCase().includes(search) && !(t.source || '').toLowerCase().includes(search)) return false;
+        return true;
     });
-    return '<p>' + html.trim() + '</p>';
-  }).join('');
-  
-  document.getElementById('reading-prog').style.width = '33%';
-  showView('view-reading');
+    const grid = document.getElementById('lib-grid');
+    grid.innerHTML = '';
+    if (!filtered.length) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon">📭</div><div class="empty-state-text">Metin bulunamadı. Filtreleri temizleyin.</div></div>';
+        updateStats();
+        return;
+    }
+    filtered.forEach(t => {
+        const done = progress.find(p => p.text_id === t.id);
+        const div = document.createElement('div');
+        div.className = 'text-card' + (done ? ' completed' : '');
+        const catClass  = 'cat-' + (t.category || 'general');
+        const catLabel  = CAT_LABELS[t.category] || 'Genel';
+        const diffClass = 'diff-' + (t.difficulty || 'intermediate');
+        const diffLabel = DIFF_LABELS[t.difficulty] || 'Intermediate';
+        const wc = wordCount(t.words);
+        const qc = Array.isArray(t.questions) ? t.questions.length : 0;
+        div.innerHTML =
+            '<div class="card-badge-row"><span class="card-cat ' + catClass + '">' + catLabel + '</span><span class="card-diff ' + diffClass + '">' + diffLabel + '</span></div>'
+            + (done ? '<span class="card-score">' + (done.score || 0) + '%</span>' : '<span class="card-new">Yeni</span>')
+            + '<div class="card-title">' + esc(t.title || 'Başlıksız') + '</div>'
+            + '<div class="card-meta">' + (wc ? wc + ' kelime' : '') + (qc ? ' · ' + qc + ' soru' : '') + '</div>';
+        div.onclick = () => openText(t.id);
+        grid.appendChild(div);
+    });
+    updateStats();
 }
 
-function showWordPopup(word) {
-  if(!currentText || !currentText.words || !currentText.words[word]) return;
-  const info = currentText.words[word];
-  document.getElementById('popup-word').textContent = word;
-  document.getElementById('popup-tr').textContent = info.tr || '';
-  document.getElementById('popup-example').textContent = info.ex ? `"${info.ex}"` : '';
-  document.getElementById('word-popup').classList.add('visible');
-  if(!learnedWordsThisSession.includes(word)) learnedWordsThisSession.push(word);
-  setTimeout(()=>document.getElementById('word-popup').classList.remove('visible'), 4000);
+function updateStats() {
+    const progress = (student && Array.isArray(student.progress)) ? student.progress : [];
+    const total = currentTexts.length;
+    const done  = progress.length;
+    const avg   = done > 0 ? Math.round(progress.reduce((s, p) => s + (p.score || 0), 0) / done) : 0;
+    const learned = (student && Array.isArray(student.learned_words)) ? student.learned_words.length : 0;
+    document.getElementById('stat-done').textContent  = done;
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-avg').textContent   = avg + '%';
+    document.getElementById('stat-words').textContent = learned;
 }
 
-function goToLibrary() { showLibrary(); }
-function goToReading() { if(currentText) showView('view-reading'); }
+/* ---------- Okuma ---------- */
+function openText(id) {
+    const t = currentTexts.find(x => x.id === id);
+    if (!t) return;
+    currentText = t;
+    document.getElementById('reading-cat').textContent = CAT_LABELS[t.category] || 'Genel';
+    document.getElementById('reading-cat').className = 'reading-cat cat-' + (t.category || 'general');
+    document.getElementById('reading-title').textContent = t.title || 'Başlıksız';
+    document.getElementById('reading-source').textContent = t.source || '';
+    const body = document.getElementById('reading-body');
+    body.innerHTML = '';
+    const wordKeys = (t.words && typeof t.words === 'object' && !Array.isArray(t.words)) ? Object.keys(t.words) : [];
+    const pattern = wordKeys.length
+        ? new RegExp('\\b(' + wordKeys.map(w => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')\\b', 'gi')
+        : null;
+    (t.passage || []).forEach(p => {
+        const pEl = document.createElement('p');
+        if (pattern) {
+            pEl.innerHTML = esc(p).replace(pattern, m => '<span class="target-word" onclick="showWordPopup(event,\'' + m.replace(/'/g, "\\'") + '\')">' + m + '</span>');
+        } else {
+            pEl.textContent = p;
+        }
+        body.appendChild(pEl);
+    });
+    document.getElementById('reading-prog').style.width = '33%';
+    showView('view-reading');
+}
 
-// ═══════════════════════════════════════════════════════════════
-// QUESTIONS
-// ═══════════════════════════════════════════════════════════════
+function showWordPopup(e, word) {
+    if (e && e.stopPropagation) e.stopPropagation();
+    const popup = document.getElementById('word-popup');
+    const words = (currentText && currentText.words && typeof currentText.words === 'object') ? currentText.words : {};
+    let entry = words[word] || words[word.toLowerCase()];
+    if (!entry) {
+        const k = Object.keys(words).find(x => x.toLowerCase() === word.toLowerCase());
+        if (k) entry = words[k];
+    }
+    if (!entry) return;
+    document.getElementById('popup-word').textContent = word;
+    document.getElementById('popup-tr').textContent = entry.tr || '';
+    document.getElementById('popup-example').textContent = entry.ex ? '"' + entry.ex + '"' : '';
+    const rect = e.target.getBoundingClientRect();
+    popup.style.left = (rect.left + window.scrollX) + 'px';
+    popup.style.top  = (rect.bottom + window.scrollY + 6) + 'px';
+    popup.classList.add('visible');
+    setTimeout(() => document.addEventListener('click', closeWordPopup, { once: true }), 0);
+}
+function closeWordPopup() { document.getElementById('word-popup').classList.remove('visible'); }
+
+function goToReading() { showView('view-reading'); }
+function goToLibrary() { showView('view-library'); renderLibrary(); }
+
+/* ---------- Sorular ---------- */
 function startQuestions() {
-  if(!currentText) return;
-  currentQuestionIdx = 0; currentAnswers = [];
-  renderQuestion();
-  showView('view-questions');
+    questions = (currentText && Array.isArray(currentText.questions)) ? currentText.questions.slice() : [];
+    currentQuestion = 0; answers = [];
+    if (!questions.length) { showToast('warning', 'Bu metinde soru bulunmuyor'); return; }
+    showView('view-questions');
+    renderQuestion();
 }
 
 function renderQuestion() {
-  const q = currentText.questions[currentQuestionIdx];
-  const total = currentText.questions.length;
-  document.getElementById('q-number').textContent = `Soru ${currentQuestionIdx+1} / ${total}`;
-  document.getElementById('q-text').textContent = q.q;
-  document.getElementById('q-progress-text').textContent = `${currentQuestionIdx+1}/${total}`;
-  
-  const opts = document.getElementById('q-options');
-  opts.innerHTML = q.opts.map((opt, i) => `
-    <div class="q-option" id="opt-${i}" onclick="selectAnswer(${i})">
-      <div class="opt-letter">${String.fromCharCode(65+i)}</div>
-      <div>${opt}</div>
-    </div>
-  `).join('');
-  
-  // Mini progress dots
-  const dots = document.getElementById('q-mini-prog');
-  dots.innerHTML = currentText.questions.map((_, i) => {
-    if(i < currentQuestionIdx) {
-      const correct = currentAnswers[i] === currentText.questions[i].ans;
-      return `<div class="q-dot ${correct?'done-correct':'done-wrong'}"></div>`;
-    }
-    if(i === currentQuestionIdx) return `<div class="q-dot current"></div>`;
-    return `<div class="q-dot"></div>`;
-  }).join('');
-  
-  document.getElementById('q-feedback').style.display = 'none';
-  document.getElementById('q-feedback').className = 'q-feedback';
-  document.getElementById('q-next-btn').style.display = 'none';
+    const q = questions[currentQuestion];
+    if (!q) return;
+    document.getElementById('q-number').textContent = 'Soru ' + (currentQuestion + 1) + ' / ' + questions.length;
+    document.getElementById('q-text').textContent = q.q || '';
+    document.getElementById('q-progress-text').textContent = (currentQuestion + 1) + ' / ' + questions.length;
+    const opts = document.getElementById('q-options');
+    opts.innerHTML = '';
+    const letters = ['A', 'B', 'C', 'D', 'E'];
+    (q.opts || []).forEach((opt, i) => {
+        const div = document.createElement('div');
+        div.className = 'q-option';
+        div.innerHTML = '<div class="opt-letter">' + letters[i] + '</div><div style="flex:1">' + esc(opt || '') + '</div>';
+        div.onclick = () => selectAnswer(i);
+        opts.appendChild(div);
+    });
+    document.getElementById('q-feedback').style.display = 'none';
+    document.getElementById('q-feedback').className = 'q-feedback';
+    document.getElementById('q-next-btn').style.display = 'none';
+    updateMiniProgress();
 }
 
 function selectAnswer(idx) {
-  const q = currentText.questions[currentQuestionIdx];
-  const fb = document.getElementById('q-feedback');
-  const next = document.getElementById('q-next-btn');
-  const correct = idx === q.ans;
-  currentAnswers[currentQuestionIdx] = idx;
-  
-  document.querySelectorAll('.q-option').forEach((el, i) => {
-    el.classList.add('disabled');
-    if(i === q.ans) el.classList.add('correct');
-    else if(i === idx && !correct) el.classList.add('wrong');
-  });
-  
-  fb.style.display = 'block';
-  fb.className = 'q-feedback ' + (correct?'correct':'wrong');
-  fb.innerHTML = `<span class="q-feedback-icon">${correct?'✅':'❌'}</span> ${correct?'Doğru!':'Yanlış.'} ${q.exp}`;
-  
-  const isLast = currentQuestionIdx === currentText.questions.length - 1;
-  next.textContent = isLast ? 'Sonuçları Gör →' : 'Sonraki Soru →';
-  next.style.display = 'block';
+    const q = questions[currentQuestion];
+    const correct = q.ans;
+    const opts = document.querySelectorAll('.q-option');
+    opts.forEach((o, i) => {
+        o.classList.add('disabled');
+        o.onclick = null;
+        if (i === correct) o.classList.add('correct');
+        else if (i === idx) o.classList.add('wrong');
+        if (i === idx) o.classList.add('selected');
+    });
+    const isCorrect = idx === correct;
+    answers.push(isCorrect);
+    const fb = document.getElementById('q-feedback');
+    fb.style.display = 'block';
+    fb.className = 'q-feedback ' + (isCorrect ? 'correct' : 'wrong');
+    fb.innerHTML = '<span class="q-feedback-icon">' + (isCorrect ? '✅' : '❌') + '</span> ' + (isCorrect ? 'Doğru!' : 'Yanlış!') + (q.exp ? '<br><span style="font-size:.82rem;margin-top:6px;display:block;opacity:.9">' + esc(q.exp) + '</span>' : '');
+    document.getElementById('q-next-btn').style.display = 'block';
+    updateMiniProgress();
 }
 
 function nextQuestion() {
-  if(currentQuestionIdx < currentText.questions.length - 1) {
-    currentQuestionIdx++;
+    currentQuestion++;
+    if (currentQuestion >= questions.length) { showResults(); return; }
     renderQuestion();
-  } else {
-    showResults();
-  }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// RESULTS
-// ═══════════════════════════════════════════════════════════════
+function updateMiniProgress() {
+    const bar = document.getElementById('q-mini-prog');
+    bar.innerHTML = '';
+    for (let i = 0; i < questions.length; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'q-dot';
+        if (i < currentQuestion) dot.classList.add(answers[i] ? 'done-correct' : 'done-wrong');
+        else if (i === currentQuestion) dot.classList.add('current');
+        bar.appendChild(dot);
+    }
+}
+
 function showResults() {
-  const totalQ = currentText.questions.length;
-  let correct = 0;
-  currentAnswers.forEach((a, i) => { if(a === currentText.questions[i].ans) correct++; });
-  const score = Math.round((correct / totalQ) * 100);
-  
-  document.getElementById('results-emoji').textContent = score >= 80 ? '🎉' : score >= 60 ? '👍' : score >= 40 ? '🤔' : '💪';
-  document.getElementById('results-title').textContent = score >= 80 ? 'Mükemmel!' : score >= 60 ? 'İyi iş!' : score >= 40 ? 'Devam edin!' : 'Tekrar deneyin!';
-  document.getElementById('results-score').textContent = score + '%';
-  document.getElementById('results-label').textContent = `${correct} / ${totalQ} soru doğru`;
-  
-  const bd = document.getElementById('results-breakdown');
-  bd.innerHTML = '<div class="results-breakdown-title">SORU ANALİZİ</div>' + currentText.questions.map((q, i) => {
-    const ok = currentAnswers[i] === q.ans;
-    return `<div class="rb-item"><span>Soru ${i+1}</span><span class="${ok?'rb-correct':'rb-wrong'}">${ok?'Doğru':'Yanlış'}</span></div>`;
-  }).join('');
-  
-  const exp = document.getElementById('results-explanation');
-  exp.innerHTML = '<div class="re-title">AÇIKLAMALAR</div>' + currentText.questions.map((q, i) => {
-    const ok = currentAnswers[i] === q.ans;
-    return `<div class="re-item ${ok?'correct':'wrong'}"><div class="re-q">Soru ${i+1}: ${q.q}</div><div class="re-exp">Doğru cevap: ${String.fromCharCode(65+q.ans)}. ${q.exp}</div></div>`;
-  }).join('');
-  
-  showView('view-results');
-  saveProgress(score, correct, totalQ);
+    const correct = answers.filter(a => a === true).length;
+    const total = questions.length;
+    const score = Math.round((correct / total) * 100);
+    saveProgress(score);
+    showView('view-results');
+    let emoji = '🎉', title = 'Tebrikler!', label = 'Mükemmel performans!';
+    if (score < 60) { emoji = '⚠️'; title = 'Biraz daha pratik gerekli'; label = 'Bu metni tekrar okumayı deneyin.'; }
+    else if (score < 80) { emoji = '👍'; title = 'İyi iş!'; label = 'Metni tekrar okuyarak kelimeleri pekiştirebilirsiniz.'; }
+    document.getElementById('results-emoji').textContent = emoji;
+    document.getElementById('results-title').textContent = title;
+    document.getElementById('results-score').textContent = score + '%';
+    document.getElementById('results-label').textContent = label + ' (' + correct + ' / ' + total + ' doğru)';
+    document.getElementById('results-breakdown').innerHTML = '<div class="results-breakdown-title">Soru Analizi</div>' + questions.map((q, i) => '<div class="rb-item"><span>Soru ' + (i + 1) + '</span><span class="' + (answers[i] ? 'rb-correct' : 'rb-wrong') + '">' + (answers[i] ? 'Doğru' : 'Yanlış') + '</span></div>').join('');
+    const exp = document.getElementById('results-explanation');
+    if (questions.some(q => q.exp)) {
+        exp.style.display = 'block';
+        exp.innerHTML = '<div class="re-title">Açıklamalar</div>' + questions.map((q, i) => q.exp ? '<div class="re-item ' + (answers[i] ? 'correct' : 'wrong') + '"><div class="re-q">Soru ' + (i + 1) + '</div><div class="re-exp">' + esc(q.exp) + '</div></div>' : '').join('');
+    } else { exp.style.display = 'none'; }
 }
 
-async function saveProgress(score, correct, totalQ) {
-  if(!currentStudent || !supabaseClient) return;
-  try {
-    const answers = currentAnswers.map((a, i) => ({q:i, ans:a, correct: a===currentText.questions[i].ans}));
-    await supabaseClient.rpc('update_progress', {
-      p_student_id: currentStudent.id,
-      p_text_id: currentText.id,
-      p_score: score,
-      p_answers: answers,
-      p_words: learnedWordsThisSession
-    });
-    // Refresh local student data
-    currentStudent.progress = currentStudent.progress || {};
-    currentStudent.progress[currentText.id] = { score, completed_at: new Date().toISOString(), answers };
-    currentStudent.learned_words = [...new Set([...(currentStudent.learned_words||[]), ...learnedWordsThisSession])];
-    localStorage.setItem('yds_student', JSON.stringify(currentStudent));
-  } catch(e) { console.error('saveProgress error', e); }
+async function saveProgress(score) {
+    if (!student) return;
+    const code = localStorage.getItem('student_code') || student.access_code || '';
+    const wordKeys = (currentText.words && typeof currentText.words === 'object' && !Array.isArray(currentText.words))
+        ? Object.keys(currentText.words).map(w => w.toLowerCase()) : [];
+    try {
+        const { data, error } = await supabaseClient.rpc('save_progress', {
+            p_student_id: student.id,
+            p_code: code,
+            p_text_id: currentText.id,
+            p_text_title: currentText.title || '',
+            p_score: score,
+            p_answers: answers,
+            p_words: wordKeys
+        });
+        if (error) throw error;
+        if (data && data.success === false) { console.warn('save_progress:', data.message); return; }
+        if (!Array.isArray(student.progress)) student.progress = [];
+        const i = student.progress.findIndex(p => p.text_id === currentText.id);
+        const entry = { text_id: currentText.id, text_title: currentText.title, score: score, answered_at: new Date().toISOString() };
+        if (i >= 0) student.progress[i] = entry; else student.progress.push(entry);
+        const set = new Set((student.learned_words || []).concat(wordKeys));
+        student.learned_words = Array.from(set);
+    } catch (e) { console.error('Progress save error', e); }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// ADMIN PANEL
-// ═══════════════════════════════════════════════════════════════
+function fmtDate(iso) {
+    if (!iso) return '-';
+    const d = new Date(iso);
+    if (isNaN(d.getTime())) return '-';
+    return d.toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' });
+}
+
+/* ---------- Admin: veri & istatistik ---------- */
 async function loadAdminStats() {
-  if(!requireAdmin() || !supabaseClient) return;
-  try {
-    const { data, error } = await supabaseClient.rpc('get_admin_stats');
-    if(error) throw error;
-    const stats = data || {pending:0, active:0, expired:0, total_texts:0};
-    document.getElementById('admin-stats').innerHTML = `
-      <div class="admin-stat accent"><div class="admin-stat-num">${stats.pending}</div><div class="admin-stat-label">Bekleyen Başvuru</div></div>
-      <div class="admin-stat good"><div class="admin-stat-num">${stats.active}</div><div class="admin-stat-label">Aktif Öğrenci</div></div>
-      <div class="admin-stat warn"><div class="admin-stat-num">${stats.expired}</div><div class="admin-stat-label">Süresi Dolan</div></div>
-      <div class="admin-stat"><div class="admin-stat-num">${stats.total_texts}</div><div class="admin-stat-label">Yayında Metin</div></div>`;
-    document.getElementById('pending-count').textContent = stats.pending;
-    document.getElementById('pending-count2').textContent = stats.pending;
-  } catch(e) { console.error('loadAdminStats', e); }
+    try {
+        const { data: texts } = await supabaseClient.from('texts').select('words');
+        const { data: allS }  = await supabaseClient.rpc('get_all_students');
+        const totalTexts = texts ? texts.length : 0;
+        let totalWords = 0;
+        if (texts) texts.forEach(t => { totalWords += wordCount(t.words); });
+        const allStudents = allS || [];
+        const activeCount  = allStudents.filter(s => s.status === 'active').length;
+        const pendingCount = allStudents.filter(s => s.status === 'pending').length;
+        const expiredCount = allStudents.filter(s => s.status === 'expired').length;
+        document.getElementById('admin-stats').innerHTML =
+            '<div class="admin-stat accent"><div class="admin-stat-num">' + totalTexts + '</div><div class="admin-stat-label">Metin</div></div>'
+            + '<div class="admin-stat good"><div class="admin-stat-num">' + totalWords + '</div><div class="admin-stat-label">Kelimeler</div></div>'
+            + '<div class="admin-stat accent"><div class="admin-stat-num">' + activeCount + '</div><div class="admin-stat-label">Aktif</div></div>'
+            + '<div class="admin-stat warn"><div class="admin-stat-num">' + pendingCount + '</div><div class="admin-stat-label">Bekleyen</div></div>'
+            + '<div class="admin-stat"><div class="admin-stat-num">' + expiredCount + '</div><div class="admin-stat-label">Süre Dolmuş</div></div>';
+        document.getElementById('pending-count').textContent  = pendingCount;
+        document.getElementById('pending-count2').textContent = pendingCount;
+    } catch (e) { console.error('Stats error', e); }
 }
 
 async function loadAdminData() {
-  if(!requireAdmin() || !supabaseClient) return;
-  try {
-    const { data: students, error } = await supabaseClient.from('students').select('*').order('created_at', {ascending:false});
-    if(error) throw error;
-    renderPending(students);
-    renderActive(students);
-    renderExpired(students);
-    renderTextStats();
-  } catch(e) { console.error('loadAdminData', e); showToast('Admin verileri yüklenemedi.', 'error'); }
+    try {
+        const { data, error } = await supabaseClient.rpc('get_all_students');
+        if (error) throw error;
+        const students = data || [];
+        let pending = [], active = [], expired = [];
+        students.forEach(s => {
+            if (s.status === 'pending') pending.push(s);
+            else if (s.status === 'active') {
+                const end = s.end_date ? new Date(s.end_date) : null;
+                if (end && end < new Date()) expired.push(s); else active.push(s);
+            } else if (s.status === 'expired') expired.push(s);
+        });
+        renderPending(pending);
+        renderActive(active);
+        renderExpired(expired);
+        loadAdminStats();
+    } catch (e) {
+        showToast('error', 'Admin verisi yüklenemedi: ' + (e.message || 'Bilinmeyen hata'));
+    }
 }
 
+function progressCount(s) { return (s && Array.isArray(s.progress)) ? s.progress.length : 0; }
+
 function renderPending(students) {
-  const pending = (students || []).filter(s=>s.status==='pending');
-  const list = document.getElementById('pending-list');
-  if(pending.length===0) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">Bekleyen başvuru yok.</div></div>'; return; }
-  list.innerHTML = pending.map(s=>`
-    <div class="admin-section" style="margin-bottom:12px;padding:16px">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px">
-        <div>
-          <div style="font-weight:700;color:var(--navy)">${s.name}</div>
-          <div style="font-size:.82rem;color:var(--text-muted)">${s.email}</div>
-          ${s.note?`<div style="font-size:.78rem;color:var(--text-muted);margin-top:4px">📝 ${s.note}</div>`:''}
-          <div style="font-size:.72rem;color:var(--text-muted);margin-top:4px">Başvuru: ${fmtDate(s.created_at)}</div>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <select class="form-input" id="approve-days-${s.id}" style="width:100px;font-size:.78rem;padding:6px 8px">
-            <option value="7">7 gün</option><option value="30">30 gün</option><option value="60">60 gün</option><option value="90">90 gün</option><option value="180">180 gün</option>
-          </select>
-          <button class="btn btn-success btn-sm" onclick="approveStudent('${s.id}')">✅ Onayla</button>
-          <button class="btn btn-outline-red btn-sm" onclick="rejectStudent('${s.id}')">❌ Reddet</button>
-        </div>
-      </div>
-    </div>`).join('');
+    const list = document.getElementById('pending-list');
+    list.innerHTML = '';
+    if (!students || !students.length) { list.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📭</div><div class="empty-state-text">Bekleyen başvuru bulunmuyor.</div></div>'; return; }
+    students.forEach(s => {
+        const div = document.createElement('div');
+        div.className = 'student-card';
+        div.innerHTML = '<div class="student-card-header"><div><div class="student-card-name">' + esc(s.name || 'İsimsiz') + ' <span class="badge badge-pending">Bekliyor</span></div><div class="student-card-email">' + esc(s.email || '-') + '</div>' + (s.note ? '<div class="student-card-note">📝 ' + esc(s.note) + '</div>' : '') + '</div><div class="student-card-actions"><button class="btn btn-sm btn-success" onclick="approveStudent(\'' + s.id + '\')">✅ Onayla</button><button class="btn btn-sm btn-outline-red" onclick="rejectStudent(\'' + s.id + '\')">❌ Reddet</button></div></div><div class="student-card-date">📅 Başvuru: ' + fmtDate(s.created_at) + '</div>';
+        list.appendChild(div);
+    });
 }
 
 function renderActive(students) {
-  const active = (students || []).filter(s=>s.status==='active');
-  const tbody = document.getElementById('active-tbody');
-  document.getElementById('active-empty').style.display = active.length ? 'none' : 'block';
-  tbody.innerHTML = active.map(s=>{
-    const daysLeft = s.end_date ? Math.ceil((new Date(s.end_date)-new Date())/(1000*60*60*24)) : '?';
-    const progressCount = s.progress ? Object.keys(s.progress).length : 0;
-    return `<tr><td>${s.name}</td><td>${s.email}</td><td><span class="code-mono">${s.access_code}</span></td><td>${fmtDate(s.start_date)}</td><td>${fmtDate(s.end_date)} <span style="color:${daysLeft<=7?'var(--red)':'var(--green)'};font-size:.75rem">(${daysLeft} gün)</span></td><td><span class="badge badge-active">Aktif</span></td><td>${progressCount} metin</td><td><button class="btn btn-sm btn-outline" onclick="extendStudent('${s.id}')">+30 gün</button> <button class="btn btn-sm btn-outline-red" onclick="deleteStudent('${s.id}')">Sil</button></td></tr>`;
-  }).join('');
+    const tbody = document.getElementById('active-tbody');
+    tbody.innerHTML = '';
+    const empty = document.getElementById('active-empty');
+    if (!students || !students.length) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    students.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + esc(s.name || '-') + '</td><td>' + esc(s.email || '-') + '</td><td class="code-mono">' + esc(s.access_code || '-') + '</td><td>' + fmtDate(s.start_date) + '</td><td>' + fmtDate(s.end_date) + '</td><td><span class="badge badge-active">Aktif</span></td><td>' + progressCount(s) + ' metin</td><td><button class="btn btn-sm btn-outline" onclick="extendStudent(\'' + s.id + '\')">🔄 Uzat</button> <button class="btn btn-sm btn-outline" onclick="toggleStudentStatus(\'' + s.id + '\')">⏸ Pasif</button> <button class="btn btn-sm btn-outline-red" onclick="deleteStudent(\'' + s.id + '\')">🗑 Sil</button></td>';
+        tbody.appendChild(tr);
+    });
 }
 
 function renderExpired(students) {
-  const expired = (students || []).filter(s=>s.status==='expired');
-  const tbody = document.getElementById('expired-tbody');
-  document.getElementById('expired-empty').style.display = expired.length ? 'none' : 'block';
-  tbody.innerHTML = expired.map(s=>{
-    const progressCount = s.progress ? Object.keys(s.progress).length : 0;
-    return `<tr><td>${s.name}</td><td>${s.email}</td><td><span class="code-mono">${s.access_code||'—'}</span></td><td>${fmtDate(s.end_date)}</td><td>${progressCount} metin</td><td><button class="btn btn-sm btn-success" onclick="extendStudent('${s.id}')">Yenile +30</button> <button class="btn btn-sm btn-outline-red" onclick="deleteStudent('${s.id}')">Sil</button></td></tr>`;
-  }).join('');
-}
-
-function renderTextStats() {
-  const total = textsCache.length;
-  const byCat = {};
-  textsCache.forEach(t=>{ byCat[t.category]=(byCat[t.category]||0)+1; });
-  let html = `<div style="display:flex;gap:16px;flex-wrap:wrap">`;
-  Object.entries(byCat).forEach(([cat, count]) => {
-    html += `<div style="background:var(--slate-light);padding:10px 16px;border-radius:var(--radius)"><span style="font-weight:700">${getCategoryLabel(cat)}</span>: ${count} metin</div>`;
-  });
-  html += `</div><div style="margin-top:12px;font-size:.85rem;color:var(--text-muted)">Toplam: ${total} metin yayında</div>`;
-  document.getElementById('text-stats').innerHTML = html;
+    const tbody = document.getElementById('expired-tbody');
+    tbody.innerHTML = '';
+    const empty = document.getElementById('expired-empty');
+    if (!students || !students.length) { empty.style.display = 'block'; return; }
+    empty.style.display = 'none';
+    students.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td>' + esc(s.name || '-') + '</td><td>' + esc(s.email || '-') + '</td><td class="code-mono">' + esc(s.access_code || '-') + '</td><td>' + fmtDate(s.end_date) + '</td><td>' + progressCount(s) + ' metin</td><td><button class="btn btn-sm btn-outline" onclick="extendStudent(\'' + s.id + '\')">🔄 Uzat</button> <button class="btn btn-sm btn-outline" onclick="toggleStudentStatus(\'' + s.id + '\')">✅ Aktif</button> <button class="btn btn-sm btn-outline-red" onclick="deleteStudent(\'' + s.id + '\')">🗑 Sil</button></td>';
+        tbody.appendChild(tr);
+    });
 }
 
 async function approveStudent(id) {
-  if(!requireAdmin()) return;
-  const days = parseInt(document.getElementById('approve-days-'+id).value || 30);
-  try {
-    const { data, error } = await supabaseClient.rpc('approve_student', { p_student_id: id, p_days: days, p_admin_id: currentAdmin.id });
-    if(error) throw error;
-    if(data.success) { showToast(`Onaylandı! Kod: ${data.code}`, 'success'); loadAdminData(); loadAdminStats(); }
-    else showToast(data.message, 'error');
-  } catch(e) { console.error(e); showToast('Onay hatası.', 'error'); }
+    const daysStr = prompt('Kaç günlük erişim verilsin?', '30');
+    if (daysStr === null) return;
+    const days = parseInt(daysStr, 10);
+    if (!days || days <= 0) { showToast('error', 'Geçerli bir gün sayısı girin'); return; }
+    try {
+        const { data, error } = await supabaseClient.rpc('approve_student', { p_student_id: id, p_days: days });
+        if (error) throw error;
+        if (data && data.success === false) { showToast('error', data.message); return; }
+        showToast('success', (data && data.message) || 'Öğrenci onaylandı');
+        loadAdminData();
+    } catch (e) { showToast('error', e.message || 'Onay hatası'); }
 }
 
 async function rejectStudent(id) {
-  if(!requireAdmin()) return;
-  try {
-    const { data, error } = await supabaseClient.rpc('reject_student', { p_student_id: id });
-    if(error) throw error;
-    showToast('Başvuru reddedildi.', 'warning'); loadAdminData(); loadAdminStats();
-  } catch(e) { console.error(e); showToast('Reddetme hatası.', 'error'); }
+    if (!confirm('Bu başvuruyu reddetmek istediğinizden emin misiniz?')) return;
+    try {
+        const { data, error } = await supabaseClient.rpc('reject_student', { p_student_id: id });
+        if (error) throw error;
+        showToast('success', (data && data.message) || 'Öğrenci reddedildi');
+        loadAdminData();
+    } catch (e) { showToast('error', e.message || 'Reddetme hatası'); }
+}
+
+async function toggleStudentStatus(id) {
+    try {
+        const { data, error } = await supabaseClient.rpc('toggle_student_status', { p_student_id: id });
+        if (error) throw error;
+        showToast('success', 'Durum: ' + ((data && data.new_status) || 'değiştirildi'));
+        loadAdminData();
+    } catch (e) { showToast('error', e.message || 'Durum değiştirilemedi'); }
 }
 
 async function manualAddCode() {
-  if(!requireAdmin()) return;
-  const name = document.getElementById('man-name').value.trim();
-  const email = document.getElementById('man-email').value.trim().toLowerCase();
-  const start = document.getElementById('man-start').value;
-  const end = document.getElementById('man-end').value;
-  const code = document.getElementById('man-code').value.trim().toUpperCase();
-  if(!name || !email || !start || !end) { showToast('Tüm alanlar zorunlu.', 'warning'); return; }
-  try {
-    const { data, error } = await supabaseClient.rpc('manual_add_student', { p_name: name, p_email: email, p_start: start, p_end: end, p_code: code || null });
-    if(error) throw error;
-    if(data.success) { showToast(`Eklendi! Kod: ${data.code}`, 'success'); document.getElementById('man-name').value=''; document.getElementById('man-email').value=''; document.getElementById('man-code').value=''; loadAdminData(); loadAdminStats(); }
-    else showToast(data.message, 'error');
-  } catch(e) { console.error(e); showToast('Ekleme hatası.', 'error'); }
+    const name  = document.getElementById('man-name').value.trim();
+    const email = document.getElementById('man-email').value.trim().toLowerCase();
+    const start = document.getElementById('man-start').value;
+    const end   = document.getElementById('man-end').value;
+    const code  = document.getElementById('man-code').value.trim().toUpperCase();
+    if (!name || !email || !start || !end) { showToast('error', 'Ad, e-posta, başlangıç ve bitiş zorunlu'); return; }
+    try {
+        const { data, error } = await supabaseClient.rpc('manual_add_student', { p_name: name, p_email: email, p_start: start, p_end: end, p_code: code || null });
+        if (error) throw error;
+        if (!data || !data.success) { showToast('error', (data && data.message) || 'Ekleme başarısız'); return; }
+        showToast('success', data.message);
+        document.getElementById('man-name').value = ''; document.getElementById('man-email').value = ''; document.getElementById('man-code').value = '';
+        loadAdminData();
+    } catch (e) { showToast('error', e.message || 'Ekleme hatası'); }
 }
 
 async function extendStudent(id) {
-  if(!requireAdmin()) return;
-  try {
-    const { data, error } = await supabaseClient.rpc('extend_student', { p_student_id: id, p_days: 30 });
-    if(error) throw error;
-    showToast('Süre 30 gün uzatıldı.', 'success'); loadAdminData();
-  } catch(e) { console.error(e); showToast('Uzatma hatası.', 'error'); }
+    const daysStr = prompt('Kaç gün uzatılsın?', '30');
+    if (daysStr === null) return;
+    const days = parseInt(daysStr, 10);
+    if (!days || days <= 0) { showToast('error', 'Geçerli bir gün sayısı girin'); return; }
+    try {
+        const { data, error } = await supabaseClient.rpc('extend_student', { p_student_id: id, p_days: days });
+        if (error) throw error;
+        showToast('success', (data && data.message ? data.message : 'Uzatıldı') + (data && data.new_end ? ' (Yeni bitiş: ' + fmtDate(data.new_end) + ')' : ''));
+        loadAdminData();
+    } catch (e) { showToast('error', e.message || 'Uzatma hatası'); }
 }
 
 async function deleteStudent(id) {
-  if(!requireAdmin()) return;
-  if(!confirm('Bu öğrenciyi silmek istediğinize emin misiniz?')) return;
-  try {
-    const { data, error } = await supabaseClient.rpc('delete_student', { p_student_id: id });
-    if(error) throw error;
-    showToast('Öğrenci silindi.', 'warning'); loadAdminData(); loadAdminStats();
-  } catch(e) { console.error(e); showToast('Silme hatası.', 'error'); }
+    if (!confirm('Öğrenci kaydını silmek istediğinizden emin misiniz?')) return;
+    try {
+        const { data, error } = await supabaseClient.rpc('delete_student', { p_student_id: id });
+        if (error) throw error;
+        showToast('success', (data && data.message) || 'Silindi');
+        loadAdminData();
+    } catch (e) { showToast('error', e.message || 'Silme hatası'); }
 }
 
 async function changeAdminPassFromSettings() {
-  if(!requireAdmin()) return;
-  const oldP = document.getElementById('settings-old-pass').value;
-  const newP = document.getElementById('settings-new-pass').value;
-  if(!oldP || !newP || newP.length < 4) { showToast('Mevcut şifre ve en az 4 karakter yeni şifre girin.', 'warning'); return; }
-  try {
-    const { data, error } = await supabaseClient.rpc('change_admin_password', { p_admin_id: currentAdmin.id, p_old: oldP, p_new: newP });
-    if(error) throw error;
-    if(data.success) { showToast('Şifre güncellendi!', 'success'); document.getElementById('settings-old-pass').value=''; document.getElementById('settings-new-pass').value=''; }
-    else showToast(data.message, 'error');
-  } catch(e) { console.error(e); showToast('Şifre değişim hatası.', 'error'); }
+    const oldP = document.getElementById('settings-old-pass').value;
+    const newP = document.getElementById('settings-new-pass').value;
+    if (!oldP || !newP || newP.length < 6) { showToast('error', 'Yeni şifre en az 6 karakter olmalı'); return; }
+    if (!adminEmail) { showToast('error', 'Admin oturumu bulunamadı, tekrar giriş yapın'); return; }
+    try {
+        const { error: reauth } = await supabaseClient.auth.signInWithPassword({ email: adminEmail, password: oldP });
+        if (reauth) { showToast('error', 'Mevcut şifre yanlış'); return; }
+        const { error } = await supabaseClient.auth.updateUser({ password: newP });
+        if (error) throw error;
+        showToast('success', 'Şifre güncellendi');
+        document.getElementById('settings-old-pass').value = ''; document.getElementById('settings-new-pass').value = '';
+    } catch (e) { showToast('error', e.message || 'Şifre değiştirilemedi'); }
 }
 
-function exportAllData() {
-  if(!requireAdmin()) return;
-  showToast('Dışa aktarma yakında eklenecek.', 'info');
+async function exportAllData() {
+    try {
+        const { data, error } = await supabaseClient.rpc('get_all_students');
+        if (error) throw error;
+        const students = data || [];
+        const { data: texts } = await supabaseClient.from('texts').select('title');
+        const payload = { exportDate: new Date().toISOString(), totalStudents: students.length, totalTexts: texts ? texts.length : 0, students: students };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'yds-export-' + new Date().toISOString().slice(0, 10) + '.json';
+        a.click(); URL.revokeObjectURL(url);
+        showToast('success', 'Veriler dışa aktarıldı');
+    } catch (e) { showToast('error', e.message || 'Dışa aktarma hatası'); }
 }
 
-function resetAllData() {
-  if(!requireAdmin()) return;
-  if(!confirm('TÜM verileri sıfırlamak istediğinize emin misiniz? Bu geri alınamaz!')) return;
-  showToast('Sıfırlama yakında eklenecek.', 'info');
+async function resetAllData() {
+    if (!confirm('TÜM öğrenci verilerini silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) return;
+    try {
+        const { data, error } = await supabaseClient.rpc('reset_all_students');
+        if (error) throw error;
+        showToast('success', (data && data.message) || 'Tüm öğrenci verileri silindi');
+        loadAdminData();
+    } catch (e) { showToast('error', e.message || 'Sıfırlama hatası'); }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// WORD UPLOAD (ADMIN)
-// ═══════════════════════════════════════════════════════════════
-function initUploadDropzone() {
-  const dz = document.getElementById('upload-dropzone');
-  if(!dz) return;
-  dz.ondragover = e => { e.preventDefault(); dz.classList.add('dragover'); };
-  dz.ondragleave = e => { e.preventDefault(); dz.classList.remove('dragover'); };
-  dz.ondrop = e => {
-    e.preventDefault(); dz.classList.remove('dragover');
-    const files = e.dataTransfer.files;
-    if(files.length) handleFileUpload({files:files});
-  };
-}
-
+/* ---------- Admin: metin yükleme ---------- */
 async function handleFileUpload(input) {
-  const file = input.files ? input.files[0] : input[0];
-  if(!file) return;
-  if(!file.name.endsWith('.docx')) { showToast('Sadece .docx dosyaları desteklenir. Lütfen .doc dosyanızı .docx\'e dönüştürün.', 'error'); return; }
-  
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({arrayBuffer});
-    const rawText = result.value;
-    document.getElementById('upload-raw-preview').textContent = rawText.substring(0, 800) + (rawText.length>800?'...':'') || '(boş dosya)';
-    document.getElementById('upload-preview-area').style.display = 'block';
-    
-    // Attempt auto-parse
-    const parsed = parseWordText(rawText);
-    document.getElementById('up-title').value = parsed.title || file.name.replace('.docx','');
-    document.getElementById('up-source').value = parsed.source || '';
-    document.getElementById('up-passage').value = parsed.passage || '';
-    document.getElementById('up-words').value = parsed.words || '';
-    document.getElementById('up-questions').value = parsed.questions || '';
-    
-    showToast('Dosya okundu. Lütfen alanları kontrol edip kaydedin.', 'success');
-  } catch(e) {
-    console.error(e);
-    showToast('Dosya okunamadı: ' + e.message, 'error');
-  }
+    const file = input.files[0];
+    if (!file) return;
+    if (!file.name.toLowerCase().endsWith('.docx')) { showToast('error', 'Sadece .docx dosyaları desteklenir'); return; }
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer });
+        const raw = result.value;
+        document.getElementById('upload-raw-preview').textContent = raw.substring(0, 2000) + (raw.length > 2000 ? '...' : '');
+        document.getElementById('upload-preview-area').style.display = 'block';
+        parseWordText(raw);
+    } catch (e) { showToast('error', 'Dosya okunamadı: ' + e.message); }
 }
 
-function parseWordText(text) {
-  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l);
-  if(!lines.length) return {};
-  
-  // Simple heuristic parsing
-  const title = lines[0] || '';
-  let passage = [];
-  let words = [];
-  let questions = [];
-  let mode = 'passage';
-  
-  for(let i=1; i<lines.length; i++) {
-    const line = lines[i];
-    const lower = line.toLowerCase();
-    
-    if(lower.includes('kelime') || lower.includes('words') || lower.includes('target words')) {
-      mode = 'words'; continue;
+function submitUploadedText() { submitManualText(); }
+
+async function submitManualText() {
+    const d = getManualFormData();
+    if (!d.title || !d.passage.length) { showToast('error', 'Başlık ve en az bir paragraf zorunlu'); return; }
+    if (!d.questions.length) { showToast('error', 'En az bir soru ekleyin'); return; }
+    try {
+        const { data, error } = await supabaseClient.rpc('admin_add_text', {
+            p_category: d.category, p_difficulty: d.difficulty, p_title: d.title, p_source: d.source,
+            p_passage: d.passage, p_words: d.words, p_questions: d.questions
+        });
+        if (error) throw error;
+        showToast('success', 'Metin eklendi! (' + d.questions.length + ' soru, ' + Object.keys(d.words).length + ' kelime)');
+        clearManualForm();
+        clearUpload();
+        renderTextStats();
+    } catch (e) { showToast('error', e.message || 'Metin eklenirken hata'); }
+}
+
+function switchUploadTab(tab) {
+    document.getElementById('upload-tab-word').classList.toggle('active', tab === 'word');
+    document.getElementById('upload-tab-manual').classList.toggle('active', tab === 'manual');
+    document.getElementById('upload-panel-word').style.display   = tab === 'word'   ? 'block' : 'none';
+    document.getElementById('upload-panel-manual').style.display = tab === 'manual' ? 'block' : 'none';
+}
+
+let wordCounter = 0, questionCounter = 0;
+
+function addWordForm(wordData) {
+    wordCounter++;
+    const id = 'word-' + wordCounter;
+    const div = document.createElement('div');
+    div.className = 'word-card';
+    div.id = id;
+    div.innerHTML =
+        '<div class="word-card-header"><div class="word-card-title">Kelime #' + wordCounter + '</div>'
+        + '<button class="remove-btn" onclick="removeWordForm(\'' + id + '\')">Sil</button></div>'
+        + '<div class="word-card-body">'
+        + '<div class="form-group"><label>İngilizce</label><input type="text" class="form-input word-en" placeholder="emerged" value="' + esc(wordData && wordData.word || '') + '"></div>'
+        + '<div class="form-group"><label>Türkçe Anlam</label><input type="text" class="form-input word-tr" placeholder="ortaya çıkmak" value="' + esc(wordData && wordData.tr || '') + '"></div>'
+        + '<div class="form-group" style="grid-column:1/-1"><label>Örnek Cümle (İngilizce)</label><input type="text" class="form-input word-ex" placeholder="A new idea emerged from the discussion." value="' + esc(wordData && wordData.ex || '') + '"></div>'
+        + '</div>';
+    document.getElementById('word-list').appendChild(div);
+    document.getElementById('word-count').textContent = document.querySelectorAll('.word-card').length;
+}
+
+function removeWordForm(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+    document.getElementById('word-count').textContent = document.querySelectorAll('.word-card').length;
+}
+
+function addQuestionForm(qData) {
+    questionCounter++;
+    const id = 'question-' + questionCounter;
+    const div = document.createElement('div');
+    div.className = 'question-card';
+    div.id = id;
+    const opts = (qData && qData.opts) || ['', '', '', '', ''];
+    const correct = (qData && typeof qData.ans === 'number') ? qData.ans : 0;
+    let optHtml = '';
+    ['A', 'B', 'C', 'D', 'E'].forEach((letter, i) => {
+        optHtml += '<div class="q-opt-row"><div class="q-opt-label">' + letter + '</div><input type="text" class="form-input q-opt" placeholder="Seçenek ' + letter + '" value="' + esc(opts[i] || '') + '"></div>';
+    });
+    const correctOptions = [0, 1, 2, 3, 4].map(n => '<option value="' + n + '" ' + (correct === n ? 'selected' : '') + '>' + ['A', 'B', 'C', 'D', 'E'][n] + '</option>').join('');
+    div.innerHTML =
+        '<div class="question-card-header"><div class="question-card-title">Soru #' + questionCounter + '</div>'
+        + '<button class="remove-btn" onclick="removeQuestionForm(\'' + id + '\')">Sil</button></div>'
+        + '<div class="question-card-body">'
+        + '<div class="form-group"><label>Soru Metni</label><input type="text" class="form-input q-text-input" placeholder="Soru metnini yazın..." value="' + esc(qData && qData.q || '') + '"></div>'
+        + optHtml
+        + '<div class="form-inline"><div class="form-group"><label>Doğru Cevap</label><select class="form-input q-correct">' + correctOptions + '</select></div>'
+        + '<div class="form-group" style="flex:1"><label>Açıklama (Türkçe)</label><input type="text" class="form-input q-exp" placeholder="Metinde ... ifadesi yer almaktadır." value="' + esc(qData && qData.exp || '') + '"></div></div>'
+        + '</div>';
+    document.getElementById('question-list').appendChild(div);
+    document.getElementById('question-count').textContent = document.querySelectorAll('.question-card').length;
+}
+
+function removeQuestionForm(id) {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+    document.getElementById('question-count').textContent = document.querySelectorAll('.question-card').length;
+}
+
+function clearManualForm() {
+    document.getElementById('m-title').value = '';
+    document.getElementById('m-source').value = '';
+    document.getElementById('m-passage').value = '';
+    document.getElementById('word-list').innerHTML = '';
+    document.getElementById('question-list').innerHTML = '';
+    document.getElementById('word-count').textContent = '0';
+    document.getElementById('question-count').textContent = '0';
+    wordCounter = 0;
+    questionCounter = 0;
+}
+
+function getManualFormData() {
+    const title = document.getElementById('m-title').value.trim();
+    const source = document.getElementById('m-source').value.trim();
+    const category = document.getElementById('m-category').value;
+    const difficulty = document.getElementById('m-difficulty').value;
+    const passage = document.getElementById('m-passage').value.split('\n').map(p => p.trim()).filter(Boolean);
+    const words = {};
+    document.querySelectorAll('.word-card').forEach(card => {
+        const en = card.querySelector('.word-en').value.trim();
+        const tr = card.querySelector('.word-tr').value.trim();
+        const ex = card.querySelector('.word-ex').value.trim();
+        if (en) words[en.toLowerCase()] = { tr: tr, ex: ex };
+    });
+    const questions = [];
+    document.querySelectorAll('.question-card').forEach(card => {
+        const q = card.querySelector('.q-text-input').value.trim();
+        const opts = Array.from(card.querySelectorAll('.q-opt')).map(i => i.value.trim()).filter(Boolean);
+        const ans = parseInt(card.querySelector('.q-correct').value, 10) || 0;
+        const exp = card.querySelector('.q-exp').value.trim();
+        if (q && opts.length >= 2) questions.push({ q: q, opts: opts, ans: ans, exp: exp });
+    });
+    return { title, source, category, difficulty, passage, words, questions };
+}
+
+function parseWordText(raw) {
+    const lines = raw.split('\n').map(l => l.trim()).filter(l => l);
+    let title = '', source = '', category = 'history', difficulty = 'intermediate';
+    let passage = [], words = [], questions = [];
+    let mode = null;
+    let currentQ = null;
+    for (let i = 0; i < lines.length; i++) {
+        const l = lines[i];
+        if (/^BAŞLIK[:：]/.test(l)) { title = l.replace(/^BAŞLIK[:：]\s*/, ''); mode = null; continue; }
+        if (/^KAYNAK[:：]/.test(l)) { source = l.replace(/^KAYNAK[:：]\s*/, ''); mode = null; continue; }
+        if (/^KATEGOR[Iİ][:：]/.test(l)) {
+            const c = l.replace(/^KATEGOR[Iİ][:：]\s*/, '').toLowerCase();
+            if (['history', 'psychology', 'economics', 'science', 'society', 'technology'].includes(c)) category = c;
+            mode = null; continue;
+        }
+        if (/^ZORLUK[:：]/.test(l)) {
+            const d = l.replace(/^ZORLUK[:：]\s*/, '').toLowerCase();
+            if (['intermediate', 'upper', 'advanced'].includes(d)) difficulty = d;
+            mode = null; continue;
+        }
+        if (/^PARAGRAF[:：]?/.test(l)) { mode = 'passage'; continue; }
+        if (/^KEL[İI]MELER[:：]?/.test(l)) { mode = 'words'; continue; }
+        if (/^SORU\s*\d+[:：]?/.test(l)) {
+            if (currentQ) questions.push(currentQ);
+            currentQ = { q: l.replace(/^SORU\s*\d+[:：]?\s*/, ''), opts: [], ans: 0, exp: '' };
+            mode = 'question'; continue;
+        }
+        if (mode === 'passage') passage.push(l);
+        else if (mode === 'words') {
+            const m = l.match(/^(.+?)[:：]\s*(.+?)\s*-\s*(.+)$/);
+            if (m) words.push({ word: m[1].trim(), tr: m[2].trim(), ex: m[3].trim() });
+            else {
+                const m2 = l.match(/^(.+?)[:：]\s*(.+)$/);
+                if (m2) words.push({ word: m2[1].trim(), tr: m2[2].trim(), ex: '' });
+            }
+        }
+        else if (mode === 'question' && currentQ) {
+            if (/^[A-E][.)]/.test(l)) {
+                currentQ.opts.push(l.replace(/^[A-E][.)]\s*/, '').trim());
+            } else if (/^DO[ĞG]RU[:：]/.test(l)) {
+                const ans = l.replace(/^DO[ĞG]RU[:：]\s*/, '').trim().toUpperCase();
+                currentQ.ans = { A: 0, B: 1, C: 2, D: 3, E: 4 }[ans] || 0;
+            } else if (/^AÇIKLAMA[:：]/.test(l)) {
+                currentQ.exp = l.replace(/^AÇIKLAMA[:：]\s*/, '').trim();
+            }
+        }
     }
-    if(lower.includes('soru') || lower.includes('question') || lower.includes('sorular')) {
-      mode = 'questions'; continue;
-    }
-    if(lower.includes('kaynak') || lower.includes('source')) {
-      mode = 'source'; continue;
-    }
-    
-    if(mode === 'passage') passage.push(line);
-    else if(mode === 'words') words.push(line);
-    else if(mode === 'questions') questions.push(line);
-  }
-  
-  return {
-    title: title,
-    passage: passage.join('\n\n'),
-    words: words.join('\n'),
-    questions: questions.join('\n')
-  };
+    if (currentQ) questions.push(currentQ);
+    clearManualForm();
+    document.getElementById('m-title').value = title;
+    document.getElementById('m-source').value = source;
+    document.getElementById('m-category').value = category;
+    document.getElementById('m-difficulty').value = difficulty;
+    document.getElementById('m-passage').value = passage.join('\n');
+    words.forEach(w => addWordForm(w));
+    questions.forEach(q => addQuestionForm(q));
+    switchUploadTab('manual');
+    showToast('success', 'Word dosyası ayrıştırıldı. Lütfen alanları kontrol edip kaydedin.');
 }
 
 function clearUpload() {
-  document.getElementById('upload-file').value = '';
-  document.getElementById('upload-preview-area').style.display = 'none';
-  document.getElementById('up-title').value='';
-  document.getElementById('up-source').value='';
-  document.getElementById('up-passage').value='';
-  document.getElementById('up-words').value='';
-  document.getElementById('up-questions').value='';
+    document.getElementById('upload-preview-area').style.display = 'none';
+    document.getElementById('upload-raw-preview').textContent = '';
+    document.getElementById('upload-file').value = '';
 }
 
-async function submitUploadedText() {
-  if(!requireAdmin()) return;
-  
-  const title = document.getElementById('up-title').value.trim();
-  const source = document.getElementById('up-source').value.trim();
-  const category = document.getElementById('up-category').value;
-  const difficulty = document.getElementById('up-difficulty').value;
-  const passageRaw = document.getElementById('up-passage').value.trim();
-  const wordsRaw = document.getElementById('up-words').value.trim();
-  const questionsRaw = document.getElementById('up-questions').value.trim();
-  
-  if(!title || !passageRaw || !questionsRaw) { showToast('Başlık, metin ve sorular zorunlu.', 'warning'); return; }
-  
-  // Parse passage
-  const passage = passageRaw.split(/\n\n+/).map(p=>p.trim()).filter(p=>p);
-  
-  // Parse words: "word: meaning - example" or "word: meaning"
-  const wordsObj = {};
-  wordsRaw.split('\n').forEach(line => {
-    line = line.trim();
-    if(!line) return;
-    const match = line.match(/^([^:]+):\s*(.+)$/);
-    if(match) {
-      const word = match[1].trim().toLowerCase();
-      const rest = match[2].trim();
-      const exMatch = rest.match(/^(.+?)\s*-\s*(.+)$/);
-      if(exMatch) {
-        wordsObj[word] = { tr: exMatch[1].trim(), ex: exMatch[2].trim() };
-      } else {
-        wordsObj[word] = { tr: rest, ex: '' };
-      }
-    }
-  });
-  
-  // Parse questions: "Question|A)opt1|B)opt2|C)opt3|D)opt4|ansIndex|exp"
-  // Or try to parse more flexible formats
-  const questionsArr = [];
-  const qLines = questionsRaw.split('\n').filter(l=>l.trim());
-  // Support multi-line question blocks separated by blank lines or specific patterns
-  let currentQ = null;
-  qLines.forEach(line => {
-    line = line.trim();
-    if(/^(\d+[:.)\s]|Soru|Question)/i.test(line) || /^[A-D][).\s]/.test(line)) {
-      if(currentQ && currentQ.q) { questionsArr.push(currentQ); currentQ = null; }
-    }
-    if(!currentQ) currentQ = { q:'', opts:['','','',''], ans:0, exp:'' };
-    
-    if(/^[A-D][).\s]\s*/.test(line)) {
-      const letter = line[0].toUpperCase();
-      const idx = letter.charCodeAt(0) - 65;
-      const text = line.replace(/^[A-D][).\s]\s*/, '');
-      if(idx>=0 && idx<4) currentQ.opts[idx] = text;
-    } else if(/Doğru|Cevap|Answer|Ans:/i.test(line)) {
-      const m = line.match(/[:)\s]\s*(\d|[A-D])/i);
-      if(m) {
-        const v = m[1].toUpperCase();
-        currentQ.ans = /[A-D]/.test(v) ? (v.charCodeAt(0)-65) : (parseInt(v)||0);
-      }
-    } else if(/Açıkl|Exp|Explanation/i.test(line)) {
-      currentQ.exp = line.replace(/.*?[:)\s]\s*/, '');
-    } else {
-      if(!currentQ.q) currentQ.q = line; else currentQ.q += ' ' + line;
-    }
-  });
-  if(currentQ && currentQ.q) questionsArr.push(currentQ);
-  
-  // Fallback: if no questions parsed, try pipe-delimited format
-  if(questionsArr.length === 0) {
-    questionsRaw.split('\n').forEach(line => {
-      const parts = line.split('|').map(p=>p.trim()).filter(p=>p);
-      if(parts.length >= 3) {
-        const qText = parts[0];
-        const opts = parts.slice(1, 5);
-        const ans = parseInt(parts[5]) || 0;
-        const exp = parts[6] || '';
-        while(opts.length < 4) opts.push('');
-        questionsArr.push({ q: qText, opts: opts.slice(0,4), ans: Math.max(0, Math.min(3, ans)), exp: exp });
-      }
-    });
-  }
-  
-  if(questionsArr.length < 1) { showToast('En az 1 soru parse edilemedi. Formatı kontrol edin.', 'warning'); return; }
-  
-  const payload = {
-    category, difficulty, title, source,
-    passage, words: wordsObj, questions: questionsArr,
-    is_published: true
-  };
-  
-  try {
-    const { data, error } = await supabaseClient.from('texts').insert(payload).select();
-    if(error) throw error;
-    showToast(`Metin kaydedildi! ID: ${data[0].id}`, 'success');
-    clearUpload();
-    loadTexts();
-    loadAdminStats();
-  } catch(e) {
-    console.error(e);
-    showToast('Kaydetme hatası: ' + (e.message || 'Bilinmeyen hata'), 'error');
-  }
+async function renderTextStats() {
+    try {
+        const { data, error } = await supabaseClient.from('texts').select('id,category,difficulty,words').order('created_at', { ascending: false });
+        if (error) throw error;
+        const stats = {}, diffStats = {};
+        let totalWords = 0;
+        (data || []).forEach(t => {
+            stats[t.category] = (stats[t.category] || 0) + 1;
+            diffStats[t.difficulty] = (diffStats[t.difficulty] || 0) + 1;
+            totalWords += wordCount(t.words);
+        });
+        const catLabels = { history: '📜 Tarih', psychology: '🧠 Psikoloji', economics: '📈 Ekonomi', science: '🔬 Bilim', society: '🌍 Toplum', technology: '💻 Teknoloji' };
+        const diffLabels = { intermediate: '🟢 Intermediate', upper: '🟡 Upper', advanced: '🔴 Advanced' };
+        let html = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-bottom:18px">';
+        for (const [k, v] of Object.entries(stats)) { html += '<div class="admin-stat"><div class="admin-stat-num">' + v + '</div><div class="admin-stat-label">' + (catLabels[k] || k) + '</div></div>'; }
+        for (const [k, v] of Object.entries(diffStats)) { html += '<div class="admin-stat accent"><div class="admin-stat-num">' + v + '</div><div class="admin-stat-label">' + (diffLabels[k] || k) + '</div></div>'; }
+        html += '<div class="admin-stat good"><div class="admin-stat-num">' + totalWords + '</div><div class="admin-stat-label">Toplam Kelime</div></div></div>';
+        document.getElementById('text-stats').innerHTML = html;
+    } catch (e) { console.error(e); }
 }
 
-// ═══════════════════════════════════════════════════════════════
-// UTILS
-// ═══════════════════════════════════════════════════════════════
-function fmtDate(d) {
-  if(!d) return '—';
-  const date = new Date(d);
-  return isNaN(date) ? String(d).substring(0,10) : date.toLocaleDateString('tr-TR');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// START
-// ═══════════════════════════════════════════════════════════════
-init();
+document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
