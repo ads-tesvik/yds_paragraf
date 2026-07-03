@@ -151,6 +151,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans
     <div class="home-title" id="home-title"></div>
     <div class="home-sub">Birkaç dakikan mı var? 1 soruluk hızlı test çöz. Daha fazla zamanın varsa 10 soruluk karma test ya da tam deneme dene.</div>
     <div class="mode-grid" id="mode-grid"></div>
+    <div class="section-title">⏱️ Tam Deneme <span style="font-weight:400;font-size:.78rem;color:var(--text-muted)">— her biri sabit ~80 soru, birbirini tekrar etmez, 180 dakika süreli</span></div>
+    <div class="mode-grid" id="deneme-grid" style="margin-bottom:32px"></div>
     <div class="section-title">🎯 Konuya Göre Çalış <span style="font-weight:400;font-size:.78rem;color:var(--text-muted)">— eksik olduğunu düşündüğün soru tipini seç</span></div>
     <div class="qtype-grid" id="qtype-grid"></div>
   </div>
@@ -243,6 +245,7 @@ const ATOMIC_QTYPES = QTYPES.filter(q => q.key !== 'okuma').map(q => q.key);
 const LETTERS = ['A','B','C','D','E'];
 const FULL_EXAM_TARGET = 80;
 const FULL_EXAM_MINUTES = 180;
+const FULL_EXAM_COUNT = 5; // her kategori için sabit deneme sayısı (Deneme 1-5)
 
 let student = null;
 let activeExamCategory = 'YDS';
@@ -281,6 +284,13 @@ function showToast(type, msg){
 function shuffle(arr){ const a = arr.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 function sample(arr, n){ return shuffle(arr).slice(0, Math.min(n, arr.length)); }
 function fmtTime(sec){ const m = Math.floor(sec/60), s = sec%60; return (m<10?'0':'')+m+':'+(s<10?'0':'')+s; }
+// Bir soru id'sini (ör. 'q123' veya 'text45_q2') 1..n arasında SABİT bir "deneme grubuna" atar.
+// Aynı soru her zaman aynı Deneme N'e düşer -> Deneme 1-5 birbirini tekrar etmeyen, kalıcı setlerdir.
+function stableBucket(id, n){
+  let h = 0;
+  for (let i = 0; i < id.length; i++) { h = (h * 31 + id.charCodeAt(i)) >>> 0; }
+  return (h % n) + 1;
+}
 
 /* ---------- Oturum ---------- */
 async function init(){
@@ -326,8 +336,7 @@ function renderModeGrid(){
   grid.innerHTML = '';
   const modes = [
     {icon:'⚡', title:'1 Soruluk Hızlı Test', desc:'Birkaç dakikan varsa tek soru çöz.', fn:() => launchQuiz('single', ATOMIC_QTYPES.concat(['okuma']), 1)},
-    {icon:'🧩', title:'10 Soruluk Karma Test', desc:'Farklı soru tiplerinden karışık 10 soru.', fn:() => launchQuiz('mix10', ATOMIC_QTYPES.concat(['okuma']), 10)},
-    {icon:'⏱️', title:'Tam Deneme (~' + FULL_EXAM_TARGET + ' Soru)', desc:FULL_EXAM_MINUTES + ' dakika süreli, gerçek sınav simülasyonu.', fn:() => launchFullExam()}
+    {icon:'🧩', title:'10 Soruluk Karma Test', desc:'Farklı soru tiplerinden karışık 10 soru.', fn:() => launchQuiz('mix10', ATOMIC_QTYPES.concat(['okuma']), 10)}
   ];
   modes.forEach(m => {
     const div = document.createElement('div');
@@ -336,6 +345,18 @@ function renderModeGrid(){
     div.onclick = m.fn;
     grid.appendChild(div);
   });
+  renderDenemeGrid();
+}
+function renderDenemeGrid(){
+  const grid = document.getElementById('deneme-grid');
+  grid.innerHTML = '';
+  for (let n = 1; n <= FULL_EXAM_COUNT; n++) {
+    const div = document.createElement('div');
+    div.className = 'mode-card';
+    div.innerHTML = '<div class="mode-card-icon">📝</div><div class="mode-card-title">Deneme ' + n + '</div><div class="mode-card-desc">~' + FULL_EXAM_TARGET + ' soru · ' + FULL_EXAM_MINUTES + ' dakika</div>';
+    div.onclick = () => launchFullExam(n);
+    grid.appendChild(div);
+  }
 }
 async function loadQtypeCounts(){
   const grid = document.getElementById('qtype-grid');
@@ -422,8 +443,8 @@ async function launchQuiz(mode, qtypes, count){
   const wantsReading = qtypes.includes('okuma');
   const atomicWanted = qtypes.filter(q => q !== 'okuma');
   const [readingItems, atomicItems, masteredRefs] = await Promise.all([
-    wantsReading ? fetchReadingItems(activeExamCategory, 30) : Promise.resolve([]),
-    atomicWanted.length ? fetchAtomicItems(activeExamCategory, atomicWanted, 40) : Promise.resolve([]),
+    wantsReading ? fetchReadingItems(activeExamCategory, 200) : Promise.resolve([]),
+    atomicWanted.length ? fetchAtomicItems(activeExamCategory, atomicWanted, 130) : Promise.resolve([]),
     fetchMasteredRefs(activeExamCategory)
   ]);
   pool = readingItems.concat(atomicItems).filter(it => !masteredRefs.has(it.id));
@@ -435,13 +456,17 @@ async function launchQuiz(mode, qtypes, count){
   const picked = sample(pool, count);
   startQuizSession(mode, picked, qtypes, null);
 }
-async function launchFullExam(){
-  lastLaunch = {mode:'full_exam'};
-  showToast('info', 'Deneme sınavı hazırlanıyor…');
-  const [readingItems, atomicItems] = await Promise.all([
-    fetchReadingItems(activeExamCategory, 12),
-    fetchAtomicItems(activeExamCategory, ATOMIC_QTYPES, 20)
+async function launchFullExam(denemeNo){
+  lastLaunch = {mode:'full_exam', denemeNo};
+  showToast('info', 'Deneme ' + denemeNo + ' hazırlanıyor…');
+  // Tüm havuzu (kategori genelinde) çekip id'ye göre SABİT bir gruba (1..FULL_EXAM_COUNT) ayırıyoruz.
+  // Böylece "Deneme 3" her zaman aynı soruları içerir ve diğer denemelerle çakışmaz.
+  const [readingItemsAll, atomicItemsAll] = await Promise.all([
+    fetchReadingItems(activeExamCategory, 400),
+    fetchAtomicItems(activeExamCategory, ATOMIC_QTYPES, 150)
   ]);
+  const readingItems = readingItemsAll.filter(it => stableBucket(it.id, FULL_EXAM_COUNT) === denemeNo);
+  const atomicItems  = atomicItemsAll.filter(it => stableBucket(it.id, FULL_EXAM_COUNT) === denemeNo);
   if (!readingItems.length && !atomicItems.length) { showToast('error', 'Bu kategori için henüz soru eklenmemiş.'); return; }
   // Okuma parçalarını gruplu tut (passage sırayla, o metnin tüm soruları arka arkaya)
   const readingByPassage = {};
@@ -460,7 +485,7 @@ async function launchFullExam(){
     const forType = shuffle(atomicItems.filter(a => a.qtype === qt)).slice(0, perType);
     atomicChosen = atomicChosen.concat(forType);
   });
-  // hedefe tam ulaşamazsak kalan havuzdan rastgele tamamla
+  // hedefe tam ulaşamazsak AYNI DENEME GRUBUNUN kalan havuzundan tamamla (başka denemeye taşmaz)
   if (readingChosen.length + atomicChosen.length < FULL_EXAM_TARGET) {
     const used = new Set(atomicChosen.map(a=>a.id));
     const leftovers = shuffle(atomicItems.filter(a => !used.has(a.id)));
@@ -470,6 +495,9 @@ async function launchFullExam(){
     }
   }
   const finalItems = readingChosen.concat(shuffle(atomicChosen));
+  if (finalItems.length < FULL_EXAM_TARGET) {
+    showToast('warning', 'Bu deneme için havuzda ' + finalItems.length + ' soru var (' + FULL_EXAM_TARGET + ' hedeflenmişti) — yine de başlatılıyor.');
+  }
   startQuizSession('full_exam', finalItems, ATOMIC_QTYPES.concat(['okuma']), FULL_EXAM_MINUTES * 60);
 }
 
@@ -644,7 +672,7 @@ async function finishQuiz(){
 }
 function retrySameMode(){
   if (!lastLaunch) { goHome(); return; }
-  if (lastLaunch.mode === 'full_exam') launchFullExam();
+  if (lastLaunch.mode === 'full_exam') launchFullExam(lastLaunch.denemeNo);
   else launchQuiz(lastLaunch.mode, lastLaunch.qtypes, lastLaunch.count);
 }
 
