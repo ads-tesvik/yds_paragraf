@@ -110,6 +110,7 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
 .cat-science{background:#dbeafe;color:#1e40af}
 .cat-society{background:#fce7f3;color:#9d174d}
 .cat-technology{background:#e0f2fe;color:#075985}
+.cat-medicine{background:#ffe4e6;color:#9f1239}
 .card-title{font-size:.98rem;font-weight:700;color:var(--navy);margin-bottom:4px;line-height:1.4;flex:1}
 .card-meta{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:.78rem;color:var(--text-muted);flex-wrap:wrap}
 .card-diff{font-weight:600;padding:2px 7px;border-radius:4px;font-size:.72rem}
@@ -302,6 +303,7 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
     <div class="auth-success" id="register-success"></div>
     <div class="form-group"><label>Ad Soyad <span style="font-weight:400;color:var(--text-muted);font-size:.78rem">(zorunlu)</span></label><input type="text" class="form-input" id="reg-name" placeholder="Tam adınız" autocomplete="name"></div>
     <div class="form-group"><label>E-posta Adresi <span style="font-weight:400;color:var(--text-muted);font-size:.78rem">(zorunlu — onay için)</span></label><input type="email" class="form-input" id="reg-email" placeholder="ornek@email.com" autocomplete="email"></div>
+    <div class="form-group"><label>Erişim Kodu Belirle <span style="font-weight:400;color:var(--text-muted);font-size:.78rem">(zorunlu — 4-20 karakter, harf/rakam; girişte bunu kullanacaksın)</span></label><input type="text" class="form-input" id="reg-code" placeholder="Örn: AHMET2026" autocomplete="off" maxlength="20" style="text-transform:uppercase;font-family:monospace;letter-spacing:1px"></div>
     <div class="form-group"><label>Not (isteğe bağlı)</label><input type="text" class="form-input" id="reg-note" placeholder="Yöneticiye iletmek istediğiniz bir not"></div>
     <button class="btn btn-primary btn-block btn-lg" onclick="submitRegistration()" style="margin-top:4px">📩 Başvuruyu Gönder →</button>
     <div class="auth-footer" style="margin-top:16px"><a onclick="showView('view-login')">← Giriş Sayfasına Dön</a></div>
@@ -330,6 +332,7 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
       <button class="filter-tab" data-cat="science">🔬 Bilim</button>
       <button class="filter-tab" data-cat="society">🌍 Toplum</button>
       <button class="filter-tab" data-cat="technology">💻 Teknoloji</button>
+      <button class="filter-tab" data-cat="medicine">🩺 Tıp/Sağlık</button>
     </div>
   </div>
   <div class="stats-bar">
@@ -491,7 +494,7 @@ textarea.form-input{min-height:120px;resize:vertical;line-height:1.6}
           <div class="form-group"><label>📌 Başlık</label><input type="text" class="form-input" id="m-title" placeholder="Metin başlığı"></div>
           <div class="form-group"><label>📚 Kaynak</label><input type="text" class="form-input" id="m-source" placeholder="Örn: Adapted from The Economist"></div>
           <div class="form-inline" style="margin-bottom:16px">
-            <div class="form-group"><label>Kategori</label><select class="form-input" id="m-category"><option value="history">📜 Tarih</option><option value="psychology">🧠 Psikoloji</option><option value="economics">📈 Ekonomi</option><option value="science">🔬 Bilim</option><option value="society">🌍 Toplum</option><option value="technology">💻 Teknoloji</option></select></div>
+            <div class="form-group"><label>Kategori</label><select class="form-input" id="m-category"><option value="history">📜 Tarih</option><option value="psychology">🧠 Psikoloji</option><option value="economics">📈 Ekonomi</option><option value="science">🔬 Bilim</option><option value="society">🌍 Toplum</option><option value="technology">💻 Teknoloji</option><option value="medicine">🩺 Tıp/Sağlık</option></select></div>
             <div class="form-group"><label>Zorluk</label><select class="form-input" id="m-difficulty"><option value="intermediate">🟢 Intermediate</option><option value="upper">🟡 Upper</option><option value="advanced">🔴 Advanced</option></select></div>
           </div>
           <div class="form-group"><label>📝 Metin Paragrafları (her paragraf yeni satır)</label><textarea class="form-input" id="m-passage" rows="6" placeholder="Paragraf 1...\nParagraf 2..."></textarea></div>
@@ -549,7 +552,7 @@ let currentTexts = [], currentText = null, questions = [], currentQuestion = 0, 
 let student = null, adminEmail = null;
 let currentCategory = 'all';
 
-const CAT_LABELS  = { history:'Tarih', psychology:'Psikoloji', economics:'Ekonomi', science:'Bilim', society:'Toplum', technology:'Teknoloji' };
+const CAT_LABELS  = { history:'Tarih', psychology:'Psikoloji', economics:'Ekonomi', science:'Bilim', society:'Toplum', technology:'Teknoloji', medicine:'Tıp/Sağlık' };
 const DIFF_LABELS = { intermediate:'Intermediate', upper:'Upper', advanced:'Advanced' };
 
 function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -663,11 +666,13 @@ function doLogout(silent) {
 async function submitRegistration() {
     const name  = document.getElementById('reg-name').value.trim();
     const email = document.getElementById('reg-email').value.trim().toLowerCase();
+    const code  = document.getElementById('reg-code').value.trim().toUpperCase();
     const note  = document.getElementById('reg-note').value.trim();
-    if (!name || !email) { showToast('error', 'Ad soyad ve e-posta zorunlu'); return; }
+    if (!name || !email || !code) { showToast('error', 'Ad soyad, e-posta ve erişim kodu zorunlu'); return; }
     if (!email.includes('@')) { showToast('error', 'Geçerli e-posta girin'); return; }
+    if (code.length < 4 || code.length > 20 || !/^[A-Z0-9]+$/.test(code)) { showToast('error', 'Erişim kodu 4-20 karakter, yalnızca harf/rakam olmalı'); return; }
     try {
-        const { data, error } = await supabaseClient.rpc('student_register', { p_name: name, p_email: email, p_note: note });
+        const { data, error } = await supabaseClient.rpc('student_register', { p_name: name, p_email: email, p_note: note, p_code: code });
         if (error) throw error;
         if (!data || !data.success) {
             document.getElementById('register-error').style.display = 'block';
@@ -678,7 +683,7 @@ async function submitRegistration() {
         document.getElementById('register-success').style.display = 'block';
         document.getElementById('register-success').textContent = '✅ ' + data.message;
         document.getElementById('register-error').style.display = 'none';
-        document.getElementById('reg-name').value = ''; document.getElementById('reg-email').value = ''; document.getElementById('reg-note').value = '';
+        document.getElementById('reg-name').value = ''; document.getElementById('reg-email').value = ''; document.getElementById('reg-code').value = ''; document.getElementById('reg-note').value = '';
         showToast('success', 'Başvuru gönderildi');
     } catch (e) {
         document.getElementById('register-error').style.display = 'block';
@@ -1319,7 +1324,7 @@ function parseWordText(raw) {
         if (/^KAYNAK[:：]/.test(l)) { source = l.replace(/^KAYNAK[:：]\s*/, ''); mode = null; continue; }
         if (/^KATEGOR[Iİ][:：]/.test(l)) {
             const c = l.replace(/^KATEGOR[Iİ][:：]\s*/, '').toLowerCase();
-            if (['history', 'psychology', 'economics', 'science', 'society', 'technology'].includes(c)) category = c;
+            if (['history', 'psychology', 'economics', 'science', 'society', 'technology', 'medicine'].includes(c)) category = c;
             mode = null; continue;
         }
         if (/^ZORLUK[:：]/.test(l)) {
@@ -1398,6 +1403,3 @@ document.addEventListener('DOMContentLoaded', init);
 </script>
 </body>
 </html>
-
-
-
